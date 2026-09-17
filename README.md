@@ -2,7 +2,7 @@
 
 Option 2 is the second design proposal for the **same portal** as Option 1: same approved content, same
 functional scope. Only the design differs.
-
+ 
 | | Source of truth |
 |---|---|
 | **What** is on each screen (content, filters, actions, order) | Finalized Option 1 — `D:\Taimaa-NTX\VQ\VQ` (read only) |
