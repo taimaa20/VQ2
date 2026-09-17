@@ -52,7 +52,7 @@
     --vq-green: #01A786;
     --vq-purple: #522D6E;
     --vq-offwhite: #FFFDF8;
-    --vq-cream: #FFFDE8;
+    --vq-cream: #FFFDF8;
 
     --page-bg: #f8fafc;
     --panel-bg: #e7f2f4;
@@ -184,7 +184,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
     gap: 0.4rem;
     padding: 0.4rem 0.75rem;
     border-radius: 999px;
-    color: var(--vq-teal-dark);
+    color: var(--vq-teal);
     font-size: 0.9375rem;
     font-weight: 500;
     -webkit-text-stroke: 0.25px currentColor;
@@ -213,7 +213,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 .search-field:hover { border-color: var(--vq-teal-dark); }
 .search-field:focus-within { border-color: var(--vq-teal); box-shadow: var(--focus); }
-.search-field i { color: var(--vq-teal-dark); font-size: 0.95rem; }
+.search-field i { color: var(--vq-teal); font-size: 0.95rem; }
 .search-field input {
     flex: 1;
     min-width: 0;
@@ -223,8 +223,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
     padding: 0.45rem 0.2rem;
     font-size: 0.9375rem;
 }
-.search-field input { color: var(--vq-teal-dark); }
-.search-field input::placeholder { color: rgba(0, 71, 79, 0.66); }
+.search-field input { color: var(--vq-teal); }
+.search-field input::placeholder { color: rgba(0, 98, 108, 0.85); }
 .search-field input::-webkit-search-cancel-button { display: none; }
 
 .text-size { display: flex; align-items: center; gap: 0.15rem; }
@@ -232,7 +232,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
     width: 2.1rem;
     height: 2.1rem;
     border-radius: 0.6rem;
-    color: var(--vq-teal-dark);
+    color: var(--vq-teal);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -257,7 +257,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
     -webkit-appearance: none;
     border: 0;
     background: transparent;
-    color: var(--vq-teal-dark);
+    color: var(--vq-teal);
     font-size: 0.875rem;
     font-weight: 500;
     -webkit-text-stroke: 0.25px currentColor;
@@ -267,7 +267,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
     outline: 0;
     direction: ltr;
 }
-.navbar-language i { color: var(--vq-teal-dark); font-size: 0.7rem; pointer-events: none; }
+.navbar-language i { color: var(--vq-teal); font-size: 0.7rem; pointer-events: none; }
 
 .profile { display: flex; align-items: center; gap: 0.55rem; min-width: 0; }
 .profile-button {
@@ -282,7 +282,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 .profile-button img { width: 100%; height: 100%; object-fit: cover; }
 .user-info { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
-.user-name { color: var(--vq-teal-dark); font-size: 1rem; font-weight: 500; -webkit-text-stroke: 0.3px currentColor; white-space: nowrap; }
+.user-name { color: var(--vq-teal); font-size: 1rem; font-weight: 500; -webkit-text-stroke: 0.3px currentColor; white-space: nowrap; }
 .user-role { color: var(--vq-teal); font-size: 0.75rem; font-weight: 400; white-space: nowrap; }
 
 .logout {
@@ -291,7 +291,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
     border-radius: 0.7rem;
     border: 1px solid var(--vq-teal);
     background: var(--vq-offwhite);
-    color: var(--vq-teal-dark);
+    color: var(--vq-teal);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1458,8 +1458,9 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
     .top-bar { flex-wrap: wrap; gap: 0.5rem; padding: 0.5rem 0.75rem; }
     .logo-image { height: 2.3rem; }
     .navbar-right { gap: 0.4rem; }
-    .search-box { order: 10; flex: 1 1 100%; }
+    .search-box { order: 10; flex: 1 1 100%; min-width: 0; }
     .search-field { width: 100%; }
+    .profile { flex-shrink: 0; }
     .search-panel { inset-inline: 0; width: auto; }
     :root { --header-h: 7.3rem; }
     .prayer-times-section { grid-template-columns: 1fr; padding: 1rem; }
