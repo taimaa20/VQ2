@@ -184,17 +184,13 @@
         { key: 'navSurveys', icon: 'fa-solid fa-square-poll-vertical', page: 'surveys' },
         { key: 'navPolicies', icon: 'fa-regular fa-folder-open', page: 'policies' },
         { key: 'navHotlines', icon: 'fa-solid fa-headset', page: 'hotlines' },
+        { key: 'navPhotos', icon: 'fa-solid fa-images', page: 'photo-gallery', also: ['album'] },
+        { key: 'navVideos', icon: 'fa-solid fa-circle-play', page: 'video-library' },
         { key: 'navCourses', icon: 'fa-solid fa-graduation-cap', page: 'courses', also: ['course-details'] },
         { key: 'navUserGuide', icon: 'fa-solid fa-book-open', page: 'user-guide' },
         { key: 'navEmployees', icon: 'fa-regular fa-address-book', page: 'employees' }
     ];
     /* Discussion Board and VQ Structure pages exist but are not menu items (as in Option 1) */
-
-    /* Galleries live in the header, as in the SPFx TopBar */
-    const NAV_HEADER = [
-        { key: 'navPhotos', icon: 'gallery', fa: 'fa-images', page: 'photo-gallery', also: ['album'] },
-        { key: 'navVideos', icon: 'video-play', fa: 'fa-circle-play', page: 'video-library' }
-    ];
 
     const isCurrent = n => n.page === PAGE || (n.also || []).indexOf(PAGE) !== -1;
 
@@ -215,15 +211,8 @@
     const headerIcon = name => `<svg class="hdr-icon" viewBox="${HEADER_ICONS[name][0]}" fill="none" stroke="currentColor" aria-hidden="true" focusable="false">${HEADER_ICONS[name][1]}</svg>`;
 
     function headerHTML() {
-        const galleries = NAV_HEADER.map(n => `<a href="${href(n.page)}" class="link-item ${isCurrent(n) ? 'is-active' : ''}" title="${t(n.key)}" ${isCurrent(n) ? 'aria-current="page"' : ''}>
-            ${headerIcon(n.icon)}<span class="link-text-label">${t(n.key)}</span></a>`).join('');
-
         return `<div class="top-bar">
             <button type="button" class="menu-toggle" id="menuToggle" aria-controls="siteMenu" aria-expanded="false" aria-label="${t('openMenu')}"><i class="fa-solid fa-bars"></i></button>
-            <div class="logo-area">
-                <a href="${href('home')}" class="logo-link" title="${t('logoHome')}"><img src="${ROOT}/assets/img/vq-logo.svg" alt="Visit Qatar" class="logo-image"></a>
-            </div>
-            <nav class="navbar-left" aria-label="${t('navGalleries')}">${galleries}</nav>
 
             <div class="navbar-right">
                 <div class="search-box" id="searchWrap">
@@ -255,15 +244,24 @@
                     <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
                 </label>
 
-                <div class="profile" title="${t('userName')} — ${t('userTitle')} · ${t('userDept')}">
-                    <span class="profile-button"><img src="${USER_PHOTO}" alt="" onerror="this.onerror=null;this.src='${ROOT}/assets/img/spfx/user.svg';"></span>
-                    <span class="user-info">
-                        <span class="user-name">${t('userName')}</span>
-                        <span class="user-role">${t('userTitle')} · ${t('userDept')}</span>
-                    </span>
+                <div class="profile" data-profile-menu>
+                    <button type="button" class="profile-trigger" data-profile-trigger aria-expanded="false" aria-label="${t('userName')}">
+                        <img src="${USER_PHOTO}" alt="${t('userName')}" onerror="this.onerror=null;this.src='${ROOT}/assets/img/spfx/user.svg';">
+                    </button>
+                    <div class="profile-dropdown" role="menu" aria-label="${t('userName')}">
+                        <div class="profile-user-card">
+                            <img src="${USER_PHOTO}" alt="${t('userName')}" onerror="this.onerror=null;this.src='${ROOT}/assets/img/spfx/user.svg';">
+                            <div>
+                                <strong>${t('userName')}</strong>
+                                <span>${t('userTitle')}</span>
+                                <small>${t('userDept')}</small>
+                            </div>
+                        </div>
+                        <div class="profile-divider"></div>
+                        <a href="${href('employees')}" class="profile-menu-link"><i class="fa-solid fa-id-card"></i><span>${t('emProfile')}</span></a>
+                        <a href="#" class="profile-menu-link logout-link" data-toast="logoutDemo" data-toast-icon="fa-right-from-bracket"><i class="fa-solid fa-right-from-bracket"></i><span>${t('logout')}</span></a>
+                    </div>
                 </div>
-
-                <a href="#" class="logout" data-toast="logoutDemo" data-toast-icon="fa-right-from-bracket" title="${t('logout')}" aria-label="${t('logout')}">${headerIcon('logout')}</a>
             </div>
         </div>`;
     }
@@ -271,12 +269,22 @@
     /* ---------- Menu (RightSidebar) ---------- */
 
     function menuHTML() {
-        return `<nav class="sidebar" aria-label="${t('navMenu')}">
-            <ul class="nav-list">
-                ${NAV_MAIN.map(n => `<li><a href="${href(n.page)}" class="nav-item ${isCurrent(n) ? 'is-active' : ''}" ${isCurrent(n) ? 'aria-current="page"' : ''}>
-                    <span class="nav-icon"><i class="${n.icon}"></i></span><span>${t(n.key)}</span></a></li>`).join('')}
-            </ul>
-        </nav>`;
+        return `<div class="sidebar-shell">
+            <div class="sidebar-header">
+                <button type="button" class="sidebar-collapse-toggle" id="sidebarCollapseToggle" aria-label="${t('openMenu')}" aria-expanded="true">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <a href="${href('home')}" class="sidebar-brand" title="${t('logoHome')}" aria-label="${t('logoHome')}">
+                    <img src="${ROOT}/assets/img/vq-logo.svg" alt="Visit Qatar" class="sidebar-brand-image">
+                </a>
+            </div>
+            <nav class="sidebar" aria-label="${t('navMenu')}">
+                <ul class="nav-list">
+                    ${NAV_MAIN.map(n => `<li><a href="${href(n.page)}" class="nav-item ${isCurrent(n) ? 'is-active' : ''}" ${isCurrent(n) ? 'aria-current="page"' : ''} data-label="${esc(t(n.key))}" title="${esc(t(n.key))}">
+                        <span class="nav-icon"><i class="${n.icon}"></i></span><span class="nav-label">${t(n.key)}</span></a></li>`).join('')}
+                </ul>
+            </nav>
+        </div>`;
     }
 
     /* ---------- Side panel (RightPanel) — Option 1's shared content, same order ---------- */
@@ -453,7 +461,6 @@
             list.push({ type, icon: ic, title: tx(title), meta, url, haystack: (both(title) + ' ' + meta + ' ' + (extra || '')).toLowerCase() });
 
         NAV_MAIN.forEach(n => add('pages', n.icon, { ar: I18N.ar[n.key], en: I18N.en[n.key] }, t('filterPages'), href(n.page)));
-        NAV_HEADER.forEach(n => add('pages', 'fa-solid ' + n.fa, { ar: I18N.ar[n.key], en: I18N.en[n.key] }, t('filterPages'), href(n.page)));
         (D.announcements || []).forEach(a => add('pages', 'fa-solid fa-bullhorn', a.title, `${t('navAnnouncements')} · ${a.number}`, href('announcement-details', { id: a.id }), both(a.summary)));
         (D.events || []).forEach(e => add('pages', 'fa-regular fa-calendar-check', e.title, `${t('navEvents')} · ${fmtDate(e.start)}`, href('event-details', { id: e.id }), both(e.location)));
         (D.news || []).forEach(n => add('pages', 'fa-regular fa-newspaper', n.title, `${t('navNews')} · ${fmtDate(n.date)}`, href('news-details', { id: n.id })));
@@ -507,11 +514,54 @@
         if (toggle) toggle.setAttribute('aria-expanded', String(open));
     }
 
+    function setSidebarCollapsed(collapsed) {
+        document.body.classList.toggle('nav-collapsed', collapsed);
+        const sidebar = $('#siteMenu');
+        if (sidebar) sidebar.classList.toggle('is-collapsed', collapsed);
+        const toggle = $('#sidebarCollapseToggle');
+        if (toggle) toggle.setAttribute('aria-expanded', String(!collapsed));
+    }
+
+    function closeProfileMenu() {
+        const profile = $('[data-profile-menu]');
+        if (!profile) return;
+        profile.classList.remove('is-open');
+        const trigger = $('[data-profile-trigger]', profile);
+        if (trigger) trigger.setAttribute('aria-expanded', 'false');
+    }
+
     function bindHeader() {
         $('#languageSelect').addEventListener('change', e => setLanguage(e.target.value));
         $('#increaseFont').addEventListener('click', () => { state.fontScale += 0.05; applyFontScale(); });
         $('#decreaseFont').addEventListener('click', () => { state.fontScale -= 0.05; applyFontScale(); });
         $('#menuToggle').addEventListener('click', () => setMenu(!document.body.classList.contains('menu-open')));
+
+        const collapseToggle = $('#sidebarCollapseToggle');
+        if (collapseToggle) {
+            collapseToggle.addEventListener('click', () => {
+                if (window.innerWidth <= 1024) {
+                    setMenu(!document.body.classList.contains('menu-open'));
+                    return;
+                }
+                const collapsed = document.body.classList.contains('nav-collapsed');
+                setSidebarCollapsed(!collapsed);
+            });
+        }
+
+        const profile = $('[data-profile-menu]');
+        if (profile) {
+            const trigger = $('[data-profile-trigger]', profile);
+            trigger.addEventListener('click', e => {
+                e.preventDefault();
+                e.stopPropagation();
+                const open = !profile.classList.contains('is-open');
+                closeProfileMenu();
+                if (open) {
+                    profile.classList.add('is-open');
+                    trigger.setAttribute('aria-expanded', 'true');
+                }
+            });
+        }
 
         const input = $('#globalSearch');
         input.addEventListener('focus', openSearchPanel);
@@ -550,11 +600,16 @@
 
     function renderChrome() {
         $('#siteHeader').innerHTML = headerHTML();
-        bindHeader();
         $('#siteMenu').innerHTML = menuHTML();
+        bindHeader();
         $('#sidePanel').innerHTML = panelHTML();
         $('#siteFooter').innerHTML = footerHTML();
         startVision();
+        if (window.innerWidth <= 1024) {
+            setSidebarCollapsed(false);
+        } else {
+            setSidebarCollapsed(true);
+        }
     }
 
     function mountShell() {
@@ -790,6 +845,9 @@
 
             const wrap = $('#searchWrap');
             if (wrap && !wrap.contains(e.target)) closeSearchPanel();
+
+            const profile = $('[data-profile-menu]');
+            if (profile && !profile.contains(e.target)) closeProfileMenu();
         });
 
         document.addEventListener('keydown', e => {
@@ -800,7 +858,14 @@
             }
         });
 
-        window.addEventListener('resize', () => { if (window.innerWidth > 1024) setMenu(false); });
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 1024) {
+                setMenu(false);
+                if (!document.body.classList.contains('nav-collapsed')) setSidebarCollapsed(true);
+            } else {
+                setSidebarCollapsed(false);
+            }
+        });
     }
 
     /* ---------- Page lifecycle ---------- */
@@ -823,6 +888,7 @@
         applyFontScale();
         mountShell();
         renderChrome();
+        setSidebarCollapsed(true);
         bindGlobal();
         if (def.setup) def.setup($('#pageContent'));
         renderPage();
