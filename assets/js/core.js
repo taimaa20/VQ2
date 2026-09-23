@@ -6,8 +6,8 @@
      .header        TopBar       (logo · galleries · search · text size · language · user · sign-out)
      .sidebar-left  RightSidebar (teal menu with the white active tab)
      .content       page canvas  (one web part per page, rendered by assets/js/pages/*.js)
-     .sidebar-right RightPanel   (weather · prayer times · system links · message/vision/mission ·
-                                  structure & guide · hotlines — Option 1's shared content and order)
+     .sidebar-right RightPanel   (system links · weather · prayer times · message/vision/mission ·
+                                  structure & guide · hotlines)
      .footer        FooterBar    (social links · copyright · certificate logos)
    No backend: everything reads from the /data files.
    ========================================================================== */
@@ -212,14 +212,26 @@
 
     function headerHTML() {
         return `<div class="top-bar">
-            <button type="button" class="menu-toggle" id="menuToggle" aria-controls="siteMenu" aria-expanded="false" aria-label="${t('openMenu')}"><i class="fa-solid fa-bars"></i></button>
+            <div class="header-start">
+                <a href="${href('home')}" class="header-logo" title="${t('logoHome')}" aria-label="${t('logoHome')}">
+                    <img src="${ROOT}/assets/img/vq-logo.svg" alt="Visit Qatar">
+                </a>
+                <button type="button" class="menu-toggle" id="menuToggle" aria-controls="siteMenu" aria-expanded="false" aria-label="${t('openMenu')}">
+                    <i class="fa-solid fa-bars" aria-hidden="true"></i>
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+            </div>
 
             <div class="navbar-right">
                 <div class="search-box" id="searchWrap">
+                    <button type="button" class="search-toggle" id="searchToggle" aria-expanded="false" aria-controls="globalSearch" aria-label="${t('searchLabel')}">
+                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                    </button>
                     <label class="search-field">
                         <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                         <span class="sr-only">${t('searchLabel')}</span>
-                        <input id="globalSearch" type="search" autocomplete="off" value="${esc(state.searchQuery)}" placeholder="${t('searchPlaceholder')}">
+                        <input id="globalSearch" type="search" autocomplete="off" enterkeyhint="search" inputmode="search" value="${esc(state.searchQuery)}" placeholder="${t('searchPlaceholder')}">
                     </label>
                     <div class="search-panel" id="searchPanel" hidden>
                         <div class="search-panel-filters" id="searchFilters" role="group" aria-label="${t('searchFiltersTitle')}">
@@ -230,6 +242,7 @@
                     </div>
                 </div>
 
+                <div class="header-tools">
                 <div class="text-size" role="group" aria-label="Font size">
                     <button type="button" id="decreaseFont" title="${t('decreaseFont')}" aria-label="${t('decreaseFont')}">${headerIcon('T-moins')}</button>
                     <button type="button" id="increaseFont" title="${t('increaseFont')}" aria-label="${t('increaseFont')}">${headerIcon('T-plus')}</button>
@@ -262,6 +275,7 @@
                         <a href="#" class="profile-menu-link logout-link" data-toast="logoutDemo" data-toast-icon="fa-right-from-bracket"><i class="fa-solid fa-right-from-bracket"></i><span>${t('logout')}</span></a>
                     </div>
                 </div>
+                </div>
             </div>
         </div>`;
     }
@@ -271,11 +285,13 @@
     function menuHTML() {
         return `<div class="sidebar-shell">
             <div class="sidebar-header">
+                <p class="sidebar-title">${t('navMenu')}</p>
                 <button type="button" class="sidebar-collapse-toggle" id="sidebarCollapseToggle" aria-label="${t('openMenu')}" aria-expanded="true">
-                    <i class="fa-solid fa-bars"></i>
+                    <i class="fa-solid fa-bars" aria-hidden="true"></i>
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                 </button>
                 <a href="${href('home')}" class="sidebar-brand" title="${t('logoHome')}" aria-label="${t('logoHome')}">
-                    <img src="${ROOT}/assets/img/vq-logo.svg" alt="Visit Qatar" class="sidebar-brand-image">
+                    <img src="${ROOT}/assets/img/spfx/vq-logo-white.svg" alt="Visit Qatar" class="sidebar-brand-image">
                 </a>
             </div>
             <nav class="sidebar" aria-label="${t('navMenu')}">
@@ -351,6 +367,14 @@
         const w0 = WEATHER[0];
 
         return `<div class="prayer-times-section">
+            <section class="links-section" aria-label="${t('hpSystems')}">
+                ${panelHead(t('hpSystems'))}
+                <ul class="links-list">
+                    ${SYSTEMS.map(([url, ic, key]) => `<li><a href="${url}" target="_blank" rel="noopener noreferrer">
+                        <span class="link-icon"><i class="${ic}"></i></span><span class="link-label">${t(key)}</span></a></li>`).join('')}
+                </ul>
+            </section>
+
             <section class="panel-box weather-box" aria-label="${t('hpWeather')}">
                 ${panelHead(t('hpWeather'), `<i class="fa-solid fa-location-dot"></i> ${t('wxCity')}`)}
                 <div class="weather-today">
@@ -385,14 +409,6 @@
                     </div>`).join('')}
                 </div>
                 <p class="prayer-source">${t('hpPrayerSource')}</p>
-            </section>
-
-            <section class="links-section" aria-label="${t('hpSystems')}">
-                ${panelHead(t('hpSystems'))}
-                <ul class="links-list">
-                    ${SYSTEMS.map(([url, ic, key]) => `<li><a href="${url}" target="_blank" rel="noopener noreferrer">
-                        <span class="link-icon"><i class="${ic}"></i></span><span class="link-label">${t(key)}</span></a></li>`).join('')}
-                </ul>
             </section>
 
             <section class="panel-box" aria-label="${t('hpVision')}">
@@ -448,6 +464,7 @@
             <p class="copyright">${t('copyrightPrefix')} © Visit Qatar ${new Date().getFullYear()}</p>
             <div class="end-links">
                 <a class="cert-logos" href="${href('certificates')}" title="${t('footerCerts')}"><img src="${ROOT}/assets/img/logos-color.jpg" alt="${t('footerCerts')}"></a>
+                <a class="cert-logos iso-cert" href="${href('certificates', { cert: 'iso-21902' })}" title="${t('footerIso')}"><img src="${ROOT}/assets/img/spfx/ISO.png" alt="${t('footerIso')}"></a>
             </div>
         </footer>`;
     }
@@ -497,8 +514,34 @@
         $('#searchAll').href = href('search', { q: state.searchQuery, type: state.searchFilter !== 'all' ? state.searchFilter : '' });
     }
 
-    const openSearchPanel = () => { const p = $('#searchPanel'); if (p) { p.hidden = false; renderHeaderResults(); } };
-    const closeSearchPanel = () => { const p = $('#searchPanel'); if (p) p.hidden = true; };
+    const searchOverlayQuery = window.matchMedia('(max-width: 1024px)');
+    const syncSearchBackdrop = open => document.body.classList.toggle('search-open', open && searchOverlayQuery.matches);
+    const openSearchPanel = () => {
+        const p = $('#searchPanel');
+        if (p) { p.hidden = false; renderHeaderResults(); }
+        syncSearchBackdrop(true);
+    };
+    const closeSearchPanel = () => {
+        const p = $('#searchPanel');
+        if (p) p.hidden = true;
+        const input = $('#globalSearch');
+        if (input && document.activeElement === input) input.blur();
+        syncSearchBackdrop(false);
+    };
+    function focusSearchInput() {
+        const input = $('#globalSearch');
+        if (!input) return;
+        void input.offsetWidth;
+        input.focus();
+    }
+    const compactSearchQuery = window.matchMedia('(max-width: 480px)');
+    function setCompactSearch(open) {
+        const wrap = $('#searchWrap');
+        const toggle = $('#searchToggle');
+        if (wrap) wrap.classList.toggle('is-open', open);
+        if (toggle) toggle.setAttribute('aria-expanded', String(open));
+        if (!open) closeSearchPanel();
+    }
 
     /* ---------- Shell mount & bindings ---------- */
 
@@ -509,9 +552,23 @@
     }
 
     function setMenu(open) {
+        const wasOpen = document.body.classList.contains('menu-open');
         document.body.classList.toggle('menu-open', open);
+        document.documentElement.classList.toggle('menu-open', open);
         const toggle = $('#menuToggle');
-        if (toggle) toggle.setAttribute('aria-expanded', String(open));
+        if (toggle) {
+            toggle.setAttribute('aria-expanded', String(open));
+            toggle.setAttribute('aria-label', t(open ? 'closeMenu' : 'openMenu'));
+        }
+        const sideToggle = $('#sidebarCollapseToggle');
+        const mobile = window.innerWidth <= 1024;
+        if (sideToggle && mobile) {
+            sideToggle.setAttribute('aria-expanded', String(open));
+            sideToggle.setAttribute('aria-label', t('closeMenu'));
+        }
+        if (mobile && wasOpen && !open && toggle && document.activeElement && $('#siteMenu')?.contains(document.activeElement)) {
+            toggle.focus({ preventScroll: true });
+        }
     }
 
     function setSidebarCollapsed(collapsed) {
@@ -519,7 +576,15 @@
         const sidebar = $('#siteMenu');
         if (sidebar) sidebar.classList.toggle('is-collapsed', collapsed);
         const toggle = $('#sidebarCollapseToggle');
-        if (toggle) toggle.setAttribute('aria-expanded', String(!collapsed));
+        if (!toggle) return;
+        if (window.innerWidth <= 1024) {
+            const open = document.body.classList.contains('menu-open');
+            toggle.setAttribute('aria-expanded', String(open));
+            toggle.setAttribute('aria-label', t('closeMenu'));
+            return;
+        }
+        toggle.setAttribute('aria-expanded', String(!collapsed));
+        toggle.setAttribute('aria-label', t(collapsed ? 'openMenu' : 'closeMenu'));
     }
 
     function closeProfileMenu() {
@@ -564,6 +629,29 @@
         }
 
         const input = $('#globalSearch');
+        const searchToggle = $('#searchToggle');
+        let searchOpenedByPointer = false;
+        if (searchToggle) {
+            searchToggle.addEventListener('pointerdown', () => {
+                if (!compactSearchQuery.matches) return;
+                const wrap = $('#searchWrap');
+                if (!wrap || wrap.classList.contains('is-open')) return;
+                searchOpenedByPointer = true;
+                setCompactSearch(true);
+                focusSearchInput();
+            });
+            searchToggle.addEventListener('click', () => {
+                if (searchOpenedByPointer) {
+                    searchOpenedByPointer = false;
+                    focusSearchInput();
+                    return;
+                }
+                const wrap = $('#searchWrap');
+                const open = !(wrap && wrap.classList.contains('is-open'));
+                setCompactSearch(open);
+                if (open) focusSearchInput();
+            });
+        }
         input.addEventListener('focus', openSearchPanel);
         input.addEventListener('input', () => { state.searchQuery = input.value; openSearchPanel(); });
         input.addEventListener('keydown', e => {
@@ -599,6 +687,7 @@
     }
 
     function renderChrome() {
+        document.body.classList.remove('search-open');
         $('#siteHeader').innerHTML = headerHTML();
         $('#siteMenu').innerHTML = menuHTML();
         bindHeader();
@@ -622,6 +711,7 @@
                 <div class="footer-wrapper" id="siteFooter"></div>
             </div>
             <div class="menu-backdrop" id="menuBackdrop"></div>
+            <div class="search-backdrop" id="searchBackdrop" aria-hidden="true"></div>
             <div id="vqModalRoot"></div>
             <div id="vqToast" class="vq-toast" role="status" aria-live="polite"></div>`);
     }
@@ -844,7 +934,10 @@
             }
 
             const wrap = $('#searchWrap');
-            if (wrap && !wrap.contains(e.target)) closeSearchPanel();
+            if (wrap && !wrap.contains(e.target)) {
+                closeSearchPanel();
+                if (compactSearchQuery.matches) setCompactSearch(false);
+            }
 
             const profile = $('[data-profile-menu]');
             if (profile && !profile.contains(e.target)) closeProfileMenu();
@@ -854,9 +947,30 @@
             if (e.key === 'Escape') {
                 closeModal();
                 closeSearchPanel();
+                if (compactSearchQuery.matches) setCompactSearch(false);
+                closeProfileMenu();
                 setMenu(false);
             }
         });
+
+        let drawerSwipe = null;
+        document.addEventListener('touchstart', e => {
+            if (!document.body.classList.contains('menu-open')) return;
+            const drawer = $('#siteMenu');
+            if (!drawer || !drawer.contains(e.target)) return;
+            const touch = e.changedTouches[0];
+            drawerSwipe = { x: touch.clientX, y: touch.clientY };
+        }, { passive: true });
+        document.addEventListener('touchend', e => {
+            if (!drawerSwipe) return;
+            const touch = e.changedTouches[0];
+            const dx = touch.clientX - drawerSwipe.x;
+            const dy = touch.clientY - drawerSwipe.y;
+            drawerSwipe = null;
+            if (Math.abs(dx) < 56 || Math.abs(dx) < Math.abs(dy)) return;
+            const rtl = document.documentElement.dir === 'rtl';
+            if (rtl ? dx > 0 : dx < 0) setMenu(false);
+        }, { passive: true });
 
         window.addEventListener('resize', () => {
             if (window.innerWidth > 1024) {
@@ -888,7 +1002,6 @@
         applyFontScale();
         mountShell();
         renderChrome();
-        setSidebarCollapsed(true);
         bindGlobal();
         if (def.setup) def.setup($('#pageContent'));
         renderPage();

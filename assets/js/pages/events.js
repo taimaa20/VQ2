@@ -1,6 +1,6 @@
 /* Events & Calendars — BRD 7.3 · SPFx AdsPage (listName = Events)
    Option 1 coverage: search · category · date range · list or month calendar · next event highlight · 4 per page.
-   No map, no add-to-calendar. */
+   Calendar view highlights every day in an event range with one colour, and maps those locations. */
 (function () {
     const { t, tx, esc, ui, D } = VQ;
     const s = {
@@ -64,19 +64,10 @@
         const days = new Date(y, m, 0).getDate();
         const monthStart = VQ.isoDate(first);
         const monthEnd = VQ.isoDate(new Date(y, m - 1, days));
-        const todayIso = VQ.isoDate(VQ.today());
         const inMonth = items.filter(e => e.start <= monthEnd && e.end >= monthStart).sort((a, b) => a.start.localeCompare(b.start));
         const on = iso => inMonth.filter(e => e.start <= iso && e.end >= iso);
         const monthLabel = new Intl.DateTimeFormat(VQ.locale(), { month: 'long', year: 'numeric' }).format(first);
-
-        let cells = '<span></span>'.repeat(first.getDay());
-        for (let d = 1; d <= days; d++) {
-            const iso = VQ.isoDate(new Date(y, m - 1, d));
-            const list = on(iso);
-            cells += list.length
-                ? `<button type="button" class="cal-day has-event ${s.day === iso ? 'is-selected' : ''}" data-cal-day="${iso}" title="${esc(list.map(e => tx(e.title)).join(' · '))}">${d}</button>`
-                : `<span class="cal-day ${iso === todayIso ? 'is-today' : ''}">${d}</span>`;
-        }
+        const cells = ui.calendarCells({ year: y, month: m, events: inMonth, selected: s.day });
         const shown = s.day ? on(s.day) : inMonth;
 
         return `<div class="calendar-layout">
@@ -95,7 +86,8 @@
                     <span><i style="background:rgba(215,107,0,.35)"></i>${t('evCalToday')}</span>
                 </div>
             </div>
-            <div>
+            ${ui.calendarMap(shown)}
+            <div class="calendar-events">
                 <div class="day-list-head">
                     <h4>${s.day ? VQ.fmtDate(s.day, 'long') : `${t('evCalMonth')} (${inMonth.length})`}</h4>
                     ${s.day ? `<button type="button" class="show-more" data-cal-day="">${t('evCalShowMonth')}</button>` : ''}
@@ -112,6 +104,7 @@
         title: () => t('evTitle'),
 
         render() {
+            ui.unmountCalendarMaps(VQ.$('#pageContent'));
             VQ.content(ui.page([{ label: t('navEvents') }],
                 ui.pageHead({ title: t('evTitle'), desc: t('evDesc') }) +
                 ui.filterBar([
@@ -132,14 +125,19 @@
         update() {
             let items = filtered();
             const box = VQ.$('#results');
+            const paint = html => {
+                ui.unmountCalendarMaps(box);
+                box.innerHTML = html;
+                ui.mountCalendarMaps(box);
+            };
             const head = ui.subHead(s.view === 'calendar' ? t('hpCalendar') : t('evAll'),
                 `<div class="head-tools" style="display:flex;align-items:center;gap:.75rem">${ui.resultsCount(items.length)}${ui.viewSwitch({ name: 'view', active: s.view, items: [
                     { value: 'list', icon: 'fa-solid fa-list', label: t('hpViewList') },
                     { value: 'calendar', icon: 'fa-regular fa-calendar-days', label: t('calendarView') }
                 ] })}</div>`);
 
-            if (s.view === 'calendar') { box.innerHTML = head + calendarView(items); return; }
-            if (!items.length) { box.innerHTML = head + ui.emptyState('fa-calendar-xmark'); return; }
+            if (s.view === 'calendar') { paint(head + calendarView(items)); return; }
+            if (!items.length) { paint(head + ui.emptyState('fa-calendar-xmark')); return; }
 
             let html = '';
             const next = !hasFilters() && D.events.filter(e => VQ.daysUntil(e.start) > 0).sort((a, b) => a.start.localeCompare(b.start))[0];
@@ -148,7 +146,7 @@
                 items = items.filter(e => e.id !== next.id);
             }
             const { slice, pages } = ui.paginate(items, s, PAGE_SIZE);
-            box.innerHTML = html + head + `<div class="listing-section">${slice.map(card).join('')}</div>` + ui.pagination(s.page, pages);
+            paint(html + head + `<div class="listing-section">${slice.map(card).join('')}</div>` + ui.pagination(s.page, pages));
         },
 
         setup(root) {

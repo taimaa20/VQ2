@@ -18,6 +18,8 @@ VQData.events = [
         department: 'pr',
         country: { ar: 'قطر', en: 'Qatar' },
         location: { ar: 'الدوحة', en: 'Doha' },
+        lat: 25.2854,
+        lng: 51.5310,
         image: 'photo-1505373877841-8d25f7d46678',
         title: { ar: 'وجهات نظر عالمية CNN', en: 'CNN Global Perspectives' },
         summary: { ar: 'نخبة من كبار المسؤولين والقادة في السياسة والأعمال يناقشون أبرز القضايا في الدوحة.', en: 'Senior officials and leaders in politics and business discuss today’s most pressing issues in Doha.' },
@@ -35,6 +37,8 @@ VQData.events = [
         department: 'pr',
         country: { ar: 'قطر', en: 'Qatar' },
         location: { ar: 'قاعة الفردان', en: 'Al Fardan Hall' },
+        lat: 25.3278,
+        lng: 51.5305,
         image: 'photo-1514525253161-7a46d19cd819',
         title: { ar: 'عرض ستاند أب كوميدي - طه دسوقي', en: 'Stand-up comedy — Taha Desouky' },
         summary: { ar: 'أمسية كوميدية مع الفنان طه دسوقي في قاعة الفردان.', en: 'A comedy evening with Taha Desouky at Al Fardan Hall.' },
@@ -52,6 +56,8 @@ VQData.events = [
         department: 'hr',
         country: { ar: 'قطر', en: 'Qatar' },
         location: { ar: 'برج الدوحة', en: 'Doha Tower' },
+        lat: 25.3176,
+        lng: 51.5276,
         image: 'photo-1540575467063-178a50c2df87',
         title: { ar: 'ورشة قيادات الضيافة مع فوربس للسفر', en: 'Hospitality leadership workshop with Forbes Travel' },
         summary: { ar: 'ورشة عمل لقيادات قطاع الضيافة حول معايير الخدمة وتجربة الضيف.', en: 'A workshop for hospitality leaders on service standards and guest experience.' },
@@ -69,6 +75,8 @@ VQData.events = [
         department: 'hr',
         country: { ar: 'قطر', en: 'Qatar' },
         location: { ar: 'قاعة الاجتماعات الرئيسية', en: 'Main meeting hall' },
+        lat: 25.2895,
+        lng: 51.5338,
         image: 'photo-1576091160550-2173dba999ef',
         title: { ar: 'يوم التوعية الصحية للموظفين', en: 'Employee health awareness day' },
         summary: { ar: 'يوم مخصص للتوعية الصحية وأنماط الحياة الصحية للموظفين.', en: 'A day dedicated to health awareness and healthy lifestyles for employees.' },
@@ -86,6 +94,8 @@ VQData.events = [
         department: 'ceo',
         country: { ar: 'قطر', en: 'Qatar' },
         location: { ar: 'مركز قطر الوطني للمؤتمرات', en: 'Qatar National Convention Centre' },
+        lat: 25.3236,
+        lng: 51.4385,
         image: 'photo-1475721027785-f74eccf877e2',
         title: { ar: 'ملتقى الشركاء السياحيين', en: 'Tourism partners forum' },
         summary: { ar: 'ملتقى يجمع قطر للسياحة بشركائها في القطاع السياحي.', en: 'A forum bringing Visit Qatar together with its tourism sector partners.' },
@@ -94,5 +104,43 @@ VQData.events = [
             { ar: 'تتوفر صور الملتقى في معرض الصور.', en: 'Photos from the forum are available in the Photo Gallery.' }
         ],
         album: 'partners-forum'
+    },
+    {
+        id: 'wellness-week',
+        number: 'EV-2026-033',
+        start: '2026-09-14',
+        end: '2026-09-18',
+        category: 'wellbeing',
+        department: 'hr',
+        country: { ar: 'قطر', en: 'Qatar' },
+        location: { ar: 'قاعة الاجتماعات الرئيسية', en: 'Main meeting hall' },
+        lat: 25.2895,
+        lng: 51.5338,
+        image: 'photo-1571019614242-c5c5dee9f50b',
+        title: { ar: 'أسبوع الرفاه الوظيفي', en: 'Staff wellness week' },
+        summary: { ar: 'أسبوع من الجلسات الصحية وفعاليات الرفاه للموظفين.', en: 'A week of health sessions and wellbeing activities for staff.' },
+        body: [
+            { ar: 'يُقام أسبوع الرفاه الوظيفي في قاعة الاجتماعات الرئيسية، ويشمل فحوصات توعوية وورش عمل عن أنماط الحياة الصحية.', en: 'Staff wellness week is held in the main meeting hall, with awareness checks and workshops on healthy lifestyles.' },
+            { ar: 'البرنامج ممتد على مدار أيام الأسبوع، ويُدعى جميع الموظفين للمشاركة في أي يوم يناسبهم.', en: 'The programme runs across the working week, and all employees are welcome to join on any day that suits them.' }
+        ]
+    },
+    {
+        id: 'autumn-roadshow',
+        number: 'EV-2026-035',
+        start: '2026-09-21',
+        end: '2026-10-09',
+        category: 'conference',
+        department: 'pr',
+        country: { ar: 'قطر', en: 'Qatar' },
+        location: { ar: 'مركز قطر الوطني للمؤتمرات', en: 'Qatar National Convention Centre' },
+        lat: 25.3236,
+        lng: 51.4385,
+        image: 'photo-1511578314322-379afb476865',
+        title: { ar: 'جولة الوجهات الخريفية', en: 'Autumn destinations roadshow' },
+        summary: { ar: 'برنامج ترويجي ممتد لعدة أسابيع مع الشركاء السياحيين.', en: 'A multi-week promotional programme with tourism partners.' },
+        body: [
+            { ar: 'جولة ترويجية تمتد لثلاثة أسابيع في مركز قطر الوطني للمؤتمرات، لعرض الوجهات والبرامج الخريفية مع شركاء القطاع.', en: 'A three-week promotional roadshow at the Qatar National Convention Centre, showcasing autumn destinations and programmes with sector partners.' },
+            { ar: 'تُعقد الجلسات على مدى الفترة كاملة، ويمكن للموظفين الاطلاع على الجدول اليومي عبر التقويم.', en: 'Sessions run throughout the period, and staff can follow the daily schedule on the calendar.' }
+        ]
     }
 ];

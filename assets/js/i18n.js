@@ -25,6 +25,7 @@ window.VQ_I18N = {
         userDept: 'إدارة تقنية المعلومات',
         copyrightPrefix: 'جميع الحقوق محفوظة',
         footerCerts: 'شهادات قطر للسياحة',
+        footerIso: 'معتمد ISO 21902:2021',
 
         /* Side widgets — same wording as the homepage */
         hpWeather: 'توقعات الطقس',
@@ -149,6 +150,8 @@ window.VQ_I18N = {
         evAbout: 'عن الفعالية',
         evNumber: 'رقم الفعالية',
         evViewPhotos: 'عرض صور الفعالية',
+        evOpenMap: 'فتح في الخريطة',
+        evCalMap: 'مواقع الفعاليات',
         evCalMonth: 'فعاليات الشهر',
         evCalShowMonth: 'عرض كل الشهر',
         evCalEmpty: 'لا توجد فعاليات في هذا الشهر',
@@ -327,7 +330,7 @@ window.VQ_I18N = {
         srFor: 'نتائج البحث عن «{q}»',
         srHint: 'ابحث في الصفحات والأشخاص والمستندات والصور والفيديوهات.',
         /* Option 2 — homepage section labels (same wording as option1.html) and shell helpers */
-        hpUpdates: 'آخر التعاميم',
+        hpUpdates: 'الإعلانات',
         showAll: 'عرض الكل',
         showMore: 'عرض المزيد',
         hpEvents: 'فعاليات قطر للسياحة',
@@ -339,6 +342,7 @@ window.VQ_I18N = {
         hpNews: 'آخر الأخبار',
         hpHotlines: 'الخطوط الساخنة',
         openMenu: 'فتح القائمة',
+        closeMenu: 'إغلاق القائمة',
         languageLabel: 'اللغة',
         listView: 'قائمة',
 
@@ -403,6 +407,7 @@ window.VQ_I18N = {
         userDept: 'Information Technology Department',
         copyrightPrefix: 'All rights reserved',
         footerCerts: 'Visit Qatar Certificates',
+        footerIso: 'Certified ISO 21902:2021',
 
         /* Side widgets */
         hpWeather: 'Weather Forecast',
@@ -527,6 +532,8 @@ window.VQ_I18N = {
         evAbout: 'About the event',
         evNumber: 'Event number',
         evViewPhotos: 'View event photos',
+        evOpenMap: 'Open in maps',
+        evCalMap: 'Event locations',
         evCalMonth: 'Events this month',
         evCalShowMonth: 'Show the whole month',
         evCalEmpty: 'No events this month',
@@ -705,7 +712,7 @@ window.VQ_I18N = {
         srFor: 'Results for “{q}”',
         srHint: 'Search across pages, people, documents, images and videos.',
         /* Option 2 — homepage section labels (same wording as option1.html) and shell helpers */
-        hpUpdates: 'Latest Updates',
+        hpUpdates: 'Announcements',
         showAll: 'Show All',
         showMore: 'Show More',
         hpEvents: 'QC Events',
@@ -717,6 +724,7 @@ window.VQ_I18N = {
         hpNews: 'Latest News',
         hpHotlines: 'Hotlines',
         openMenu: 'Open menu',
+        closeMenu: 'Close menu',
         languageLabel: 'Language',
         listView: 'List',
 

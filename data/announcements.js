@@ -1,13 +1,14 @@
 /* Announcements / Circulars (BRD 7.2 & 8.6)
-   type: general (blue) · ceo (golden) · obituary (dark) · hr (burgundy)
+   Types use the secondary palette (Brand Guidelines 2025, screen values):
+   general royal teal #00626C · ceo cocoa #5A4B4A · hr crimson #AF1B3F · obituary aubergine #31263E
    image: the circular artwork already used on the homepage */
 window.VQData = window.VQData || {};
 
 VQData.announcementTypes = [
-    { key: 'general', color: '#005871', css: 'blue-background', image: 'general.png', label: { ar: 'تعميم عام', en: 'General' } },
-    { key: 'ceo', color: '#a08d31', css: 'gold-background', image: 'ceo.png', label: { ar: 'الرئيس التنفيذي', en: 'CEO' } },
-    { key: 'obituary', color: '#2b2c27', css: 'black-background', image: 'death.png', label: { ar: 'تعزية', en: 'Condolence' } },
-    { key: 'hr', color: '#8A1538', css: 'burgundy-background', image: 'HR.png', label: { ar: 'موارد بشرية', en: 'Human Resources' } }
+    { key: 'general', color: '#00626C', on: '#ffffff', css: 'teal-background', image: 'general.png', label: { ar: 'تعميم عام', en: 'General' } },
+    { key: 'ceo', color: '#5A4B4A', on: '#ffffff', css: 'cocoa-background', image: 'ceo.png', label: { ar: 'الرئيس التنفيذي', en: 'CEO' } },
+    { key: 'obituary', color: '#31263E', on: '#ffffff', css: 'aubergine-background', image: 'death.png', label: { ar: 'تعزية', en: 'Condolence' } },
+    { key: 'hr', color: '#AF1B3F', on: '#ffffff', css: 'crimson-background', image: 'HR.png', label: { ar: 'موارد بشرية', en: 'Human Resources' } }
 ];
 
 VQData.announcements = [

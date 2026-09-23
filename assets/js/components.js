@@ -160,7 +160,7 @@
     const cardDate = (iso, cls) => `<span class="card-date ${cls || ''}">${VQ.icon('calendar')}<span>${VQ.fmtCardDate(iso)}</span></span>`;
 
     const typeOfAnnouncement = key => VQ.D.announcementTypes.find(x => x.key === key);
-    const typeTag = ty => tag(tx(ty.label), 'solid', '', `background:${ty.color}`);
+    const typeTag = ty => tag(tx(ty.label), 'solid', '', `background:${ty.color};color:${ty.on || '#fff'}`);
 
     /* ---------- Listing card (AdsPage .listing-card) ---------- */
 
@@ -297,6 +297,160 @@
         return `<span class="contact-photo" style="background:${color}">${esc(initials)}</span>`;
     }
 
+    function shiftIso(iso, days) {
+        const d = VQ.toDate(iso);
+        d.setDate(d.getDate() + days);
+        return VQ.isoDate(d);
+    }
+
+    /* Month cells: every day in an event’s start–end range uses one teal highlight */
+    function calendarCells({ year, month, events, selected }) {
+        const first = new Date(year, month - 1, 1);
+        const days = new Date(year, month, 0).getDate();
+        const todayIso = VQ.isoDate(VQ.today());
+        const on = iso => events.filter(e => e.start <= iso && e.end >= iso);
+        let cells = '<span></span>'.repeat(first.getDay());
+
+        for (let d = 1; d <= days; d++) {
+            const iso = VQ.isoDate(new Date(year, month - 1, d));
+            const list = on(iso);
+            if (!list.length) {
+                cells += `<span class="cal-day${iso === todayIso ? ' is-today' : ''}">${d}</span>`;
+                continue;
+            }
+            const dow = new Date(year, month - 1, d).getDay();
+            const joinPrev = dow !== 0 && on(shiftIso(iso, -1)).length;
+            const joinNext = dow !== 6 && on(shiftIso(iso, 1)).length;
+            const cls = [
+                'cal-day', 'has-event',
+                selected === iso ? 'is-selected' : '',
+                iso === todayIso ? 'is-today' : '',
+                joinPrev && joinNext ? 'is-span-mid' : '',
+                !joinPrev && joinNext ? 'is-span-start' : '',
+                joinPrev && !joinNext ? 'is-span-end' : ''
+            ].filter(Boolean).join(' ');
+            cells += `<button type="button" class="${cls}" data-cal-day="${iso}" title="${esc(list.map(e => tx(e.title)).join(' · '))}">${d}</button>`;
+        }
+        return cells;
+    }
+
+    /* Locations map for the calendar. Pins follow the events currently listed. */
+    let leafletPromise = null;
+    let mapToken = 0;
+
+    function loadLeaflet() {
+        if (window.L) return Promise.resolve(window.L);
+        if (leafletPromise) return leafletPromise;
+        leafletPromise = new Promise((resolve, reject) => {
+            if (!document.querySelector('link[data-leaflet]')) {
+                const css = document.createElement('link');
+                css.rel = 'stylesheet';
+                css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+                css.dataset.leaflet = '1';
+                document.head.appendChild(css);
+            }
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+            script.onload = () => resolve(window.L);
+            script.onerror = () => reject(new Error('map'));
+            document.body.appendChild(script);
+        });
+        return leafletPromise;
+    }
+
+    function calendarMap(events) {
+        const ids = (events || []).map(e => e.id).filter(Boolean).join(',');
+        return `<section class="calendar-map" aria-label="${esc(t('evCalMap'))}">
+            <div class="calendar-map-head"><h4><i class="fa-solid fa-location-dot" aria-hidden="true"></i>${t('evCalMap')}</h4></div>
+            <div class="calendar-map-canvas" data-calendar-map="${esc(ids)}"></div>
+        </section>`;
+    }
+
+    function mapGroups(events) {
+        const groups = new Map();
+        (events || []).forEach(e => {
+            const lat = Number(e.lat);
+            const lng = Number(e.lng);
+            if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+            const key = `${lat.toFixed(4)},${lng.toFixed(4)}`;
+            if (!groups.has(key)) groups.set(key, { lat, lng, events: [] });
+            groups.get(key).events.push(e);
+        });
+        return [...groups.values()];
+    }
+
+    function mapPopup(group) {
+        const mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(`${group.lat},${group.lng}`);
+        const items = group.events.map(e => `<li>
+            <a href="${VQ.href('event-details', { id: e.id })}">${esc(tx(e.title))}</a>
+            <p>${esc(tx(e.location))} · ${VQ.fmtRange(e.start, e.end, 'short')}</p>
+        </li>`).join('');
+        return `<ul class="calendar-map-popup">${items}<li><a class="event-map-link" href="${mapsUrl}" target="_blank" rel="noopener noreferrer">${t('evOpenMap')}</a></li></ul>`;
+    }
+
+    function drawCalendarMap(el, events, L) {
+        if (el._leafletMap) {
+            el._leafletMap.remove();
+            el._leafletMap = null;
+        }
+        const groups = mapGroups(events);
+        const map = L.map(el, { scrollWheelZoom: false, attributionControl: true });
+        el._leafletMap = map;
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            subdomains: 'abcd',
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap &copy; CARTO'
+        }).addTo(map);
+        const icon = L.divIcon({
+            className: 'cal-pin-wrap',
+            html: '<span class="cal-pin" aria-hidden="true"><i class="fa-solid fa-location-dot"></i></span>',
+            iconSize: [28, 36],
+            iconAnchor: [14, 34],
+            popupAnchor: [0, -28]
+        });
+        const markers = groups.map(group => L.marker([group.lat, group.lng], { icon, title: group.events.map(e => tx(e.title)).join(' · ') })
+            .bindPopup(mapPopup(group))
+            .addTo(map));
+        const bounds = markers.length ? L.featureGroup(markers).getBounds() : null;
+        const focus = bounds && bounds.getNorthEast().equals(bounds.getSouthWest());
+        if (!bounds) map.setView([25.2854, 51.5310], 11);
+        else if (focus) map.setView(markers[0].getLatLng(), 14);
+        else map.fitBounds(bounds.pad(0.35), { maxZoom: 13 });
+        requestAnimationFrame(() => {
+            if (!el._leafletMap) return;
+            el._leafletMap.invalidateSize();
+            if (focus && markers[0]) markers[0].openPopup();
+        });
+    }
+
+    function mountCalendarMaps(root) {
+        if (!root) return;
+        root.querySelectorAll('[data-calendar-map]').forEach(el => {
+            const token = String(++mapToken);
+            el.dataset.mapToken = token;
+            const ids = (el.dataset.calendarMap || '').split(',').filter(Boolean);
+            const events = ids.map(id => (VQ.D.events || []).find(e => e.id === id)).filter(Boolean);
+            loadLeaflet().then(L => {
+                if (!el.isConnected || el.dataset.mapToken !== token) return;
+                drawCalendarMap(el, events, L);
+            }).catch(() => {
+                if (!el.isConnected || el.dataset.mapToken !== token) return;
+                el.innerHTML = `<p class="calendar-map-fallback">${esc(t('evCalMap'))}</p>`;
+            });
+        });
+    }
+
+    function unmountCalendarMaps(root) {
+        if (!root) return;
+        root.querySelectorAll('[data-calendar-map]').forEach(el => {
+            el.dataset.mapToken = '';
+            if (el._leafletMap) {
+                el._leafletMap.remove();
+                el._leafletMap = null;
+            }
+        });
+    }
+
     /* ---------- Slider (HomePage owl carousels) ---------- */
 
     function slider({ items, perView, gap, autoplay, arrows }) {
@@ -317,6 +471,7 @@
         resultsCount, emptyState, pagination, paginate,
         tag, statusTag, sampleBadge, cardDate, typeOfAnnouncement, typeTag, listingCard, percentBadge,
         detailsHead, dateRange, facts, block, paragraphs, checkList, backToListing,
-        docViewer, docLetterhead, docSkeleton, openDocument, videoPlayer, avatar, slider
+        docViewer, docLetterhead, docSkeleton, openDocument, videoPlayer, avatar, slider, calendarCells,
+        calendarMap, mountCalendarMaps, unmountCalendarMaps
     };
 })();

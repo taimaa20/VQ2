@@ -1,6 +1,6 @@
-/* Home — SPFx HomePage web part composition, Option 1 content and order:
-   Latest Updates → QC Events / VQ Calendar → Latest Discounts → Latest News
-   (weather, prayer times, systems, message/vision/mission, structure and hotlines live in the shared side panel) */
+/* Home — SPFx HomePage web part composition:
+   Announcements → Latest Discounts → VQ Calendar → QC Events → Latest News
+   (systems, weather, prayer times, message/vision/mission, structure and hotlines live in the shared side panel) */
 (function () {
     const { t, tx, esc, ui, D } = VQ;
 
@@ -9,7 +9,7 @@
     const DISCOUNT_IDS = ['pearl-gewan', 'restaurants', 'culture-tickets', 'fitness'];
     const ROTATE_MS = 7000;
 
-    const s = { update: 0, view: 'list', day: null, paused: false };
+    const s = { update: 0, day: null, paused: false };
     let timer = null;
 
     const byDateDesc = key => (a, b) => b[key].localeCompare(a[key]);
@@ -19,11 +19,11 @@
     const homeNews = () => D.news.slice().sort(byDateDesc('date')).slice(0, 6);
     const catOf = (list, key) => list.find(c => c.key === key);
 
-    /* ---------- 1 · Latest updates: featured circular + index of the latest four ---------- */
+    /* ---------- 1 · Announcements: featured circular + index of the latest four ---------- */
 
     function featureHTML(a) {
         const ty = ui.typeOfAnnouncement(a.type);
-        return `<a href="${VQ.href('announcement-details', { id: a.id })}" class="news-card updates-feature">
+        return `<a href="${VQ.href('announcement-details', { id: a.id })}" class="news-card updates-feature" style="--type-color:${ty.color};--type-on:${ty.on || '#fff'}">
             <div class="news-image-wrapper"><div class="news-image">${VQ.img(ty.image, '', 900, tx(ty.label))}</div></div>
             <div class="news-content">
                 <div class="card-chips">${ui.typeTag(ty)}${ui.tag(`<span class="ltr">${a.number}</span>`, 'outline')}</div>
@@ -51,7 +51,8 @@
                         </button>`;
                     }).join('')}
                 </div>
-            </div>`
+            </div>`,
+            'section-announcements'
         );
     }
 
@@ -75,7 +76,7 @@
         timer = setInterval(() => { if (!s.paused) showUpdate(s.update + 1); }, ROTATE_MS);
     }
 
-    /* ---------- 2 · Events: SPFx event cards (2 per view) or month calendar — no map ---------- */
+    /* ---------- VQ Calendar, then QC Events (separate sections, no view switch) ---------- */
 
     function eventCard(e) {
         const cat = catOf(D.eventCategories, e.category);
@@ -107,19 +108,10 @@
         const days = new Date(y, m, 0).getDate();
         const monthStart = VQ.isoDate(first);
         const monthEnd = VQ.isoDate(new Date(y, m - 1, days));
-        const todayIso = VQ.isoDate(VQ.today());
         const inMonth = events.filter(e => e.start <= monthEnd && e.end >= monthStart);
         const on = iso => inMonth.filter(e => e.start <= iso && e.end >= iso);
         const monthLabel = new Intl.DateTimeFormat(VQ.locale(), { month: 'long', year: 'numeric' }).format(first);
-
-        let cells = '<span></span>'.repeat(first.getDay());
-        for (let d = 1; d <= days; d++) {
-            const iso = VQ.isoDate(new Date(y, m - 1, d));
-            const list = on(iso);
-            cells += list.length
-                ? `<button type="button" class="cal-day has-event ${s.day === iso ? 'is-selected' : ''}" data-cal-day="${iso}" title="${esc(list.map(e => tx(e.title)).join(' · '))}">${d}</button>`
-                : `<span class="cal-day ${iso === todayIso ? 'is-today' : ''}">${d}</span>`;
-        }
+        const cells = ui.calendarCells({ year: y, month: m, events: inMonth, selected: s.day });
 
         const shown = s.day ? on(s.day) : inMonth;
         return `<div class="calendar-layout">
@@ -133,7 +125,8 @@
                 </div>
                 <p class="calendar-note"><i class="fa-solid fa-arrows-rotate"></i>${t('hpCalendarSync')}</p>
             </div>
-            <div>
+            ${ui.calendarMap(shown)}
+            <div class="calendar-events">
                 <div class="day-list-head">
                     <h4>${s.day ? VQ.fmtDate(s.day, 'long') : t('evCalTitle', { m: monthLabel })}</h4>
                     ${s.day ? `<button type="button" class="show-more" data-cal-day="">${t('evCalShowMonth')}</button>` : ''}
@@ -146,23 +139,29 @@
         </div>`;
     }
 
-    function eventsHTML() {
-        const calendar = s.view === 'calendar';
+    function calendarSection() {
         return ui.section(
             ui.sectionHead({
-                title: calendar ? t('hpCalendar') : t('hpEvents'),
-                link: VQ.href('events', calendar ? { view: 'calendar' } : null),
-                tools: ui.viewSwitch({ name: 'view', active: s.view, items: [
-                    { value: 'list', icon: 'fa-solid fa-list', label: t('hpViewList') },
-                    { value: 'calendar', icon: 'fa-regular fa-calendar-days', label: t('hpViewCalendar') }
-                ] })
+                title: t('hpCalendar'),
+                link: VQ.href('events', { view: 'calendar' })
             }) +
-            `<div id="eventsBody">${calendar ? calendarHTML() : ui.slider({ items: homeEvents().map(eventCard), perView: 2, gap: '1rem', arrows: true })}</div>`,
+            `<div id="eventsBody">${calendarHTML()}</div>`,
+            'home-calendar'
+        );
+    }
+
+    function eventsSection() {
+        return ui.section(
+            ui.sectionHead({
+                title: t('hpEvents'),
+                link: VQ.href('events')
+            }) +
+            ui.slider({ items: homeEvents().map(eventCard), perView: 2, gap: '1rem', arrows: true }),
             'home-events'
         );
     }
 
-    /* ---------- 3 · Latest discounts: 2 × 2 SPFx listing cards ---------- */
+    /* ---------- Latest discounts: 2 × 2 SPFx listing cards (rendered above the calendar) ---------- */
 
     function discountsHTML() {
         return ui.section(
@@ -208,29 +207,43 @@
         title: () => t('navHome'),
 
         render() {
-            VQ.content(`<h1 class="sr-only">${t('navHome')}</h1><div class="page-surface home-surface">${updatesHTML()}${eventsHTML()}${discountsHTML()}${newsHTML()}</div>`);
+            ui.unmountCalendarMaps(VQ.$('#pageContent'));
+            VQ.content(`<h1 class="sr-only">${t('navHome')}</h1><div class="page-surface home-surface">${updatesHTML()}${discountsHTML()}${calendarSection()}${eventsSection()}${newsHTML()}</div>`);
+            ui.mountCalendarMaps(VQ.$('#pageContent'));
             startRotation();
         },
 
         setup(root) {
+            let featureSwipe = null;
+            root.addEventListener('touchstart', e => {
+                if (!e.target.closest('#updateFeature')) return;
+                const touch = e.changedTouches[0];
+                featureSwipe = { x: touch.clientX, y: touch.clientY };
+            }, { passive: true });
+            root.addEventListener('touchend', e => {
+                if (!featureSwipe) return;
+                const touch = e.changedTouches[0];
+                const dx = touch.clientX - featureSwipe.x;
+                const dy = touch.clientY - featureSwipe.y;
+                featureSwipe = null;
+                if (Math.abs(dx) < 42 || Math.abs(dx) < Math.abs(dy)) return;
+                const rtl = document.documentElement.dir === 'rtl';
+                const next = rtl ? dx > 0 : dx < 0;
+                showUpdate(s.update + (next ? 1 : -1));
+                startRotation();
+            }, { passive: true });
+
             root.addEventListener('click', e => {
                 const tab = e.target.closest('[data-update]');
                 if (tab) { showUpdate(Number(tab.dataset.update)); startRotation(); return; }
 
-                const chip = e.target.closest('[data-chip="view"]');
-                if (chip) {
-                    s.view = chip.dataset.value;
-                    s.day = null;
-                    const section = VQ.$('.home-events');
-                    section.outerHTML = eventsHTML();
-                    VQ.initSliders(VQ.$('.home-events'));
-                    return;
-                }
-
                 const day = e.target.closest('[data-cal-day]');
                 if (day) {
                     s.day = day.dataset.calDay && day.dataset.calDay !== s.day ? day.dataset.calDay : null;
-                    VQ.$('#eventsBody').innerHTML = calendarHTML();
+                    const body = VQ.$('#eventsBody');
+                    ui.unmountCalendarMaps(body);
+                    body.innerHTML = calendarHTML();
+                    ui.mountCalendarMaps(body);
                 }
             });
             root.addEventListener('mouseleave', () => {
