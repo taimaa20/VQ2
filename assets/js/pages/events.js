@@ -87,16 +87,6 @@
                 </div>
             </div>
             ${ui.calendarMap(shown)}
-            <div class="calendar-events">
-                <div class="day-list-head">
-                    <h4>${s.day ? VQ.fmtDate(s.day, 'long') : `${t('evCalMonth')} (${inMonth.length})`}</h4>
-                    ${s.day ? `<button type="button" class="show-more" data-cal-day="">${t('evCalShowMonth')}</button>` : ''}
-                </div>
-                ${shown.length ? shown.map(e => `<a href="${VQ.href('event-details', { id: e.id })}" class="day-row">
-                    <span class="day-row-date"><strong>${VQ.fmtDay(e.start)}</strong><span>${VQ.fmtMonth(e.start)}</span></span>
-                    <span class="day-row-text"><p>${esc(tx(e.title))}</p><span>${tx(catOf(e.category).label)} · ${esc(tx(e.location))} · ${VQ.fmtRange(e.start, e.end, 'short')}</span></span>
-                </a>`).join('') : `<p class="results-count">${t('evCalEmpty')}</p>`}
-            </div>
         </div>`;
     }
 
