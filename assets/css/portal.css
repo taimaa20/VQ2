@@ -1634,7 +1634,7 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
 /* Programs & system links */
 .links-section { background: #f7fbfc; border-radius: 0.85rem; box-shadow: 0 0.0625rem 0.25rem rgba(0, 0, 0, 0.1); padding: 0.75rem 0.7rem 0.6rem; }
 .links-section .panel-head { padding: 0 0.2rem 0.45rem; }
-.links-list { max-height: 17.5rem; overflow-y: auto; padding-inline-end: 0.25rem; }
+.links-list { padding-inline-end: 0.25rem; }
 .links-list li + li { margin-top: 0.15rem; }
 .links-list a { display: flex; align-items: center; gap: 0.65rem; padding: 0.35rem 0.3rem; border-radius: 0.6rem; transition: background 0.2s ease; }
 .links-list a:hover { background: #fff; }

@@ -6,8 +6,7 @@
      .header        TopBar       (logo · galleries · search · text size · language · user · sign-out)
      .sidebar-left  RightSidebar (teal menu with the white active tab)
      .content       page canvas  (one web part per page, rendered by assets/js/pages/*.js)
-     .sidebar-right RightPanel   (system links · weather · prayer times · message/vision/mission ·
-                                  structure & guide · hotlines)
+     .sidebar-right RightPanel   (vision & mission · links · weather · prayer times · hotlines)
      .footer        FooterBar    (social links · copyright · certificate logos)
    No backend: everything reads from the /data files.
    ========================================================================== */
@@ -324,24 +323,19 @@
         ['prIsha', '19:10', 'time-isha', 'fa-star-and-crescent']
     ];
 
-    /* Scrollable list — add as many system links as needed */
-    const SYSTEMS = [
-        ['https://visitqatar.com', 'fa-solid fa-desktop', 'sysExplorer'],
-        ['https://www.office.com', 'fa-solid fa-users', 'sysHr'],
-        ['https://teams.microsoft.com', 'fa-solid fa-headset', 'sysTawasol'],
-        ['https://login.microsoftonline.com', 'fa-solid fa-file-contract', 'sysLicensing'],
-        ['https://www.microsoft365.com', 'fa-brands fa-microsoft', 'sysMicrosoft'],
-        ['https://windows365.microsoft.com', 'fa-solid fa-display', 'sysDesktop'],
-        ['https://teams.microsoft.com', 'fa-solid fa-screwdriver-wrench', 'sysItSupport'],
-        ['https://www.microsoft.com/dynamics-365', 'fa-solid fa-chart-pie', 'sysD365'],
-        ['https://seatable.io', 'fa-solid fa-table', 'sysSeaTable'],
-        ['https://visitqatar.com', 'fa-solid fa-globe', 'sysVqWebsite']
+    /* Side-panel links. External systems open in a new tab; portal pages stay in place. */
+    const LINKS = [
+        { url: 'https://visitqatar.com', external: true, icon: 'fa-solid fa-globe', key: 'linkVqWebsite' },
+        { url: 'https://www.microsoft.com/dynamics-365', external: true, icon: 'fa-solid fa-chart-pie', key: 'linkErp' },
+        { page: 'policies', icon: 'fa-regular fa-folder-open', key: 'linkPolicies' },
+        { page: 'policies', params: { category: 'forms' }, icon: 'fa-solid fa-file-signature', key: 'linkForms' },
+        { url: 'https://visitqatar.com', external: true, icon: 'fa-solid fa-robot', key: 'linkConcierge' },
+        { url: 'https://www.npc.qa/en/statistics', external: true, icon: 'fa-solid fa-chart-column', key: 'linkStats' }
     ];
 
     const STATEMENTS = [
         ['photo-1500530855697-b586d89ba3ee', 'hpVisionTitle', 'hpVisionText'],
-        ['photo-1486406146926-c627a92ad1ab', 'hpMissionTitle', 'hpMissionText'],
-        ['photo-1529156069898-49953e39b3ac', 'hpMessageTitle', 'hpMessageText']
+        ['photo-1486406146926-c627a92ad1ab', 'hpMissionTitle', 'hpMissionText']
     ];
 
     const panelHead = (title, aside) => `<div class="panel-head">
@@ -366,12 +360,32 @@
         };
         const w0 = WEATHER[0];
 
+        const linkItem = item => {
+            const url = item.page ? href(item.page, item.params) : item.url;
+            const ext = item.external ? ' target="_blank" rel="noopener noreferrer"' : '';
+            return `<li><a href="${url}"${ext}>
+                <span class="link-icon"><i class="${item.icon}"></i></span><span class="link-label">${t(item.key)}</span></a></li>`;
+        };
+
         return `<div class="prayer-times-section">
+            <section class="panel-box" aria-label="${t('hpVision')}">
+                ${panelHead(t('hpVision'))}
+                <div class="panel-body">
+                    <div class="qatar-tourism-category" data-vision>
+                        ${STATEMENTS.map(([imgId, title, text], i) => `<article class="vision-slide ${i === 0 ? 'active' : ''}">
+                            ${img(imgId, '', 500)}
+                            <h4 class="qatar-card-title">${t(title)}</h4>
+                            <p class="qatar-card-text">${t(text)}</p>
+                        </article>`).join('')}
+                        <div class="vision-dots">${STATEMENTS.map((s, i) => `<button type="button" class="${i === 0 ? 'active' : ''}" data-vision-dot="${i}" aria-label="${t(s[1])}"></button>`).join('')}</div>
+                    </div>
+                </div>
+            </section>
+
             <section class="links-section" aria-label="${t('hpSystems')}">
                 ${panelHead(t('hpSystems'))}
                 <ul class="links-list">
-                    ${SYSTEMS.map(([url, ic, key]) => `<li><a href="${url}" target="_blank" rel="noopener noreferrer">
-                        <span class="link-icon"><i class="${ic}"></i></span><span class="link-label">${t(key)}</span></a></li>`).join('')}
+                    ${LINKS.map(linkItem).join('')}
                 </ul>
             </section>
 
@@ -409,31 +423,6 @@
                     </div>`).join('')}
                 </div>
                 <p class="prayer-source">${t('hpPrayerSource')}</p>
-            </section>
-
-            <section class="panel-box" aria-label="${t('hpVision')}">
-                ${panelHead(t('hpVision'))}
-                <div class="panel-body">
-                    <div class="qatar-tourism-category" data-vision>
-                        ${STATEMENTS.map(([imgId, title, text], i) => `<article class="vision-slide ${i === 0 ? 'active' : ''}">
-                            ${img(imgId, '', 500)}
-                            <h4 class="qatar-card-title">${t(title)}</h4>
-                            <p class="qatar-card-text">${t(text)}</p>
-                        </article>`).join('')}
-                        <div class="vision-dots">${STATEMENTS.map((s, i) => `<button type="button" class="${i === 0 ? 'active' : ''}" data-vision-dot="${i}" aria-label="${t(s[1])}"></button>`).join('')}</div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="panel-box" aria-label="${t('hpStructure')}">
-                ${panelHead(t('hpStructure'))}
-                <div class="panel-body">
-                    <a href="${href('structure')}" class="structure-link">
-                        ${img('photo-1552664730-d307ca884978', '', 600, t('hpStructure'))}
-                        <span><i class="fa-solid fa-sitemap"></i>${t('stOpen')}</span>
-                    </a>
-                    <p class="panel-text">${t('hpStructureText')}</p>
-                </div>
             </section>
 
             <section class="panel-box" aria-label="${t('navHotlines')}">

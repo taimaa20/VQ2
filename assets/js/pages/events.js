@@ -6,6 +6,7 @@
     const s = {
         q: '', category: 'all', from: '', to: '', page: 1,
         view: VQ.param('view') === 'calendar' ? 'calendar' : 'list',
+        group: VQ.param('group') === 'shows' ? 'shows' : '',
         month: VQ.isoDate(VQ.today()).slice(0, 7),
         day: null
     };
@@ -18,6 +19,7 @@
     function filtered() {
         const q = s.q.trim().toLowerCase();
         return D.events
+            .filter(e => !s.group || e.group === s.group)
             .filter(e => s.category === 'all' || e.category === s.category)
             .filter(e => !s.from || e.end >= s.from)
             .filter(e => !s.to || e.start <= s.to)
@@ -91,17 +93,21 @@
     }
 
     VQ.boot({
-        title: () => t('evTitle'),
+        title: () => s.group === 'shows' ? t('hpShows') : t('evTitle'),
 
         render() {
             ui.unmountCalendarMaps(VQ.$('#pageContent'));
-            VQ.content(ui.page([{ label: t('navEvents') }],
-                ui.pageHead({ title: t('evTitle'), desc: t('evDesc') }) +
+            const shows = s.group === 'shows';
+            const cats = D.eventCategories.filter(c => !shows || c.key === 'tradeshow' || c.key === 'roadshow');
+            VQ.content(ui.page(shows
+                ? [{ label: t('navEvents'), href: VQ.href('events') }, { label: t('hpShows') }]
+                : [{ label: t('navEvents') }],
+                ui.pageHead({ title: shows ? t('hpShows') : t('evTitle'), desc: shows ? t('hpShowsDesc') : t('evDesc') }) +
                 ui.filterBar([
                     ui.filters(
                         ui.searchField({ id: 'evQ', value: s.q, placeholder: t('evSearch') }) +
                         ui.selectField({ id: 'evCat', value: s.category, label: t('category'), options: [{ value: 'all', label: t('evAllCategories') }]
-                            .concat(D.eventCategories.map(c => ({ value: c.key, label: tx(c.label) }))) }) +
+                            .concat(cats.map(c => ({ value: c.key, label: tx(c.label) }))) }) +
                         ui.dateField({ id: 'evFrom', value: s.from, label: t('from') }) +
                         ui.dateField({ id: 'evTo', value: s.to, label: t('to') }) +
                         ui.clearButton()
@@ -130,7 +136,7 @@
             if (!items.length) { paint(head + ui.emptyState('fa-calendar-xmark')); return; }
 
             let html = '';
-            const next = !hasFilters() && D.events.filter(e => VQ.daysUntil(e.start) > 0).sort((a, b) => a.start.localeCompare(b.start))[0];
+            const next = !hasFilters() && items.filter(e => VQ.daysUntil(e.start) > 0).sort((a, b) => a.start.localeCompare(b.start))[0];
             if (next) {
                 if (s.page === 1) html += hero(next);
                 items = items.filter(e => e.id !== next.id);

@@ -50,7 +50,8 @@
                     { icon: 'fa-calendar-plus', label: t('startDate'), value: VQ.fmtDate(e.start) },
                     { icon: 'fa-calendar-xmark', label: t('endDate'), value: VQ.fmtDate(e.end) },
                     { icon: 'fa-location-dot', label: t('location'), value: `<a class="event-map-link" href="${mapsUrl}" target="_blank" rel="noopener noreferrer">${place}</a>` }
-                ]) + (e.album ? `<p style="margin-top:1.1rem"><a href="${VQ.href('album', { id: e.album })}" class="btn btn-outline"><i class="fa-regular fa-images"></i>${t('evViewPhotos')}</a></p>` : '') + `</div>` +
+                ]) + (e.album ? `<p style="margin-top:1.1rem"><a href="${VQ.href('album', { id: e.album })}" class="btn btn-outline"><i class="fa-regular fa-images"></i>${t('evViewPhotos')}</a></p>` : '') +
+                (e.source ? `<p style="margin-top:0.75rem"><a href="${esc(e.source)}" class="btn btn-outline" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i>${t('evPressRelease')}</a></p>` : '') + `</div>` +
                 ui.backToListing(t('backTo', { x: t('navEvents') }), VQ.href('events'))
             ));
         }

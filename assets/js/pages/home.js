@@ -1,11 +1,11 @@
 /* Home — SPFx HomePage web part composition:
-   Announcements → Latest Discounts → VQ Calendar → QC Events → Latest News
-   (systems, weather, prayer times, message/vision/mission, structure and hotlines live in the shared side panel) */
+   Circulars → VQ Calendar → VQ & QC Events → Tradeshows & Roadshows → Latest News → Discounts
+   (vision & mission, links, weather, prayer times and hotlines live in the shared side panel) */
 (function () {
     const { t, tx, esc, ui, D } = VQ;
 
-    /* Same items as Option 1's homepage */
-    const EVENT_IDS = ['standup-taha', 'forbes-workshop', 'health-day', 'partners-forum'];
+    /* VQ public events first, then QC staff events. Shows live in their own section. */
+    const EVENT_IDS = ['global-perspectives', 'partners-forum', 'standup-taha', 'forbes-workshop'];
     const DISCOUNT_IDS = ['pearl-gewan', 'restaurants', 'culture-tickets', 'fitness'];
     const ROTATE_MS = 7000;
 
@@ -15,6 +15,7 @@
     const byDateDesc = key => (a, b) => b[key].localeCompare(a[key]);
     const updates = () => D.announcements.slice().sort(byDateDesc('start')).slice(0, 4);
     const homeEvents = () => EVENT_IDS.map(id => D.events.find(e => e.id === id)).filter(Boolean);
+    const homeShows = () => D.events.filter(e => e.group === 'shows').slice().sort((a, b) => b.start.localeCompare(a.start)).slice(0, 4);
     const homeDiscounts = () => DISCOUNT_IDS.map(id => D.discounts.find(d => d.id === id)).filter(Boolean);
     const homeNews = () => D.news.slice().sort(byDateDesc('date')).slice(0, 6);
     const catOf = (list, key) => list.find(c => c.key === key);
@@ -84,7 +85,7 @@
             <div class="card-Event">${VQ.img(e.image, '', 800)}${ui.cardDate(e.start, 'is-bottom')}</div>
             <div class="card-details">
                 <div class="card-info">
-                    <div class="card-chips">${ui.tag(tx(cat.label), '', cat.icon)}</div>
+                    <div class="card-chips">${ui.tag(tx(cat.label), '', cat.icon)}${e.owner ? ui.tag(t(e.owner === 'vq' ? 'evOwnerVq' : 'evOwnerQc')) : ''}</div>
                     <h3 class="card-title">${esc(tx(e.title))}</h3>
                     <p class="card-description">${esc(tx(e.summary))}</p>
                 </div>
@@ -151,7 +152,18 @@
         );
     }
 
-    /* ---------- Latest discounts: 2 × 2 SPFx listing cards (rendered above the calendar) ---------- */
+    function showsSection() {
+        return ui.section(
+            ui.sectionHead({
+                title: t('hpShows'),
+                link: VQ.href('events', { group: 'shows' })
+            }) +
+            ui.slider({ items: homeShows().map(eventCard), perView: 2, gap: '1rem', arrows: true }),
+            'home-events home-shows'
+        );
+    }
+
+    /* ---------- Discounts repository: 2 × 2 listing cards (not a “latest” feed) ---------- */
 
     function discountsHTML() {
         return ui.section(
@@ -198,7 +210,7 @@
 
         render() {
             ui.unmountCalendarMaps(VQ.$('#pageContent'));
-            VQ.content(`<h1 class="sr-only">${t('navHome')}</h1><div class="page-surface home-surface">${updatesHTML()}${discountsHTML()}${calendarSection()}${eventsSection()}${newsHTML()}</div>`);
+            VQ.content(`<h1 class="sr-only">${t('navHome')}</h1><div class="page-surface home-surface">${updatesHTML()}${calendarSection()}${eventsSection()}${showsSection()}${newsHTML()}${discountsHTML()}</div>`);
             ui.mountCalendarMaps(VQ.$('#pageContent'));
             startRotation();
         },

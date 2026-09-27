@@ -3,7 +3,9 @@
    Kept simple on purpose: no upload box, bulk selection, bulk download or edit controls. */
 (function () {
     const { t, tx, esc, ui, D } = VQ;
-    const s = { q: '', category: 'all', page: 1 };
+    const categoryKeys = new Set(['all'].concat(D.policyCategories.map(c => c.key)));
+    const fromUrl = VQ.param('category');
+    const s = { q: '', category: categoryKeys.has(fromUrl) ? fromUrl : 'all', page: 1 };
     const PAGE_SIZE = 6;
 
     const catOf = key => D.policyCategories.find(c => c.key === key);
