@@ -1635,11 +1635,11 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
 .links-section { background: #f7fbfc; border-radius: 0.85rem; box-shadow: 0 0.0625rem 0.25rem rgba(0, 0, 0, 0.1); padding: 0.75rem 0.7rem 0.6rem; }
 .links-section .panel-head { padding: 0 0.2rem 0.45rem; }
 .links-list { padding-inline-end: 0.25rem; }
-.links-list li + li { margin-top: 0.15rem; }
-.links-list a { display: flex; align-items: center; gap: 0.65rem; padding: 0.35rem 0.3rem; border-radius: 0.6rem; transition: background 0.2s ease; }
+.links-list li + li { margin-top: 0.05rem; }
+.links-list a { display: flex; align-items: center; gap: 0.55rem; padding: 0.18rem 0.3rem; border-radius: 0.6rem; transition: background 0.2s ease; }
 .links-list a:hover { background: #fff; }
-.link-icon { width: 2.25rem; height: 2.25rem; border-radius: 0.55rem; background: var(--vq-teal); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; flex-shrink: 0; box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.12); }
-.link-label { font-size: 0.9rem; font-weight: 500; color: #333435; text-decoration: underline; text-decoration-color: rgba(51, 52, 53, 0.35); text-underline-offset: 3px; line-height: 1.35; }
+.link-icon { width: 2rem; height: 2rem; border-radius: 0.5rem; background: var(--vq-teal); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.12); }
+.link-label { font-size: 0.9rem; font-weight: 500; color: #333435; text-decoration: underline; text-decoration-color: rgba(51, 52, 53, 0.35); text-underline-offset: 2px; line-height: 1.15; }
 .links-list a:hover .link-label { color: var(--vq-teal); text-decoration-color: var(--vq-teal); }
 
 /* Message · vision · mission carousel (RightPanel .qatar-tourism-category) */
