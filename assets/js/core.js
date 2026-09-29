@@ -187,9 +187,12 @@
         { key: 'navVideos', icon: 'fa-solid fa-circle-play', page: 'video-library' },
         { key: 'navCourses', icon: 'fa-solid fa-graduation-cap', page: 'courses', also: ['course-details'] },
         { key: 'navUserGuide', icon: 'fa-solid fa-book-open', page: 'user-guide' },
+        { key: 'navStructure', icon: 'fa-solid fa-diagram-project', page: 'structure' },
         { key: 'navEmployees', icon: 'fa-regular fa-address-book', page: 'employees' }
     ];
-    /* Discussion Board and VQ Structure pages exist but are not menu items (as in Option 1) */
+    /* Visit Qatar Structure & Guide (BRD 6.1.10) was reachable from the Option 1 side panel.
+       The side panel now holds vision, visitor statistics, links and hotlines, so the existing
+       structure page is reached from the menu instead. Discussion Board stays off the menu. */
 
     const isCurrent = n => n.page === PAGE || (n.also || []).indexOf(PAGE) !== -1;
 
@@ -302,7 +305,7 @@
         </div>`;
     }
 
-    /* ---------- Side panel (RightPanel) — Option 1's shared content, same order ---------- */
+    /* ---------- Side panel (RightPanel) and the compact top widgets ---------- */
 
     const WEATHER = [
         { icon: 'fa-sun wx-sun', label: 'wxSunny', hi: 36, lo: 29 },
@@ -314,10 +317,14 @@
         { icon: 'fa-cloud-sun wx-cloud-sun', label: 'wxPartly', hi: 38, lo: 31 }
     ];
 
+    /* Static prototype times (no prayer API).
+       [key, time, css class, icon, hidden] — a `hidden` entry stays in the data but is not
+       shown in the widget and is never picked as "next". Sunrise is hidden at the client's
+       request (the widget shows the five prayers only); drop the flag to bring it back. */
     const PRAYERS = [
         ['prFajr', '04:15', 'time-fajr', 'fa-moon'],
-        ['prSunrise', '05:19', 'time-sunrise', 'fa-sun'],
-        ['prDhuhr', '11:30', 'time-dhuhr', 'fa-sun', true],
+        ['prSunrise', '05:19', 'time-sunrise', 'fa-sun', true],
+        ['prDhuhr', '11:30', 'time-dhuhr', 'fa-sun'],
         ['prAsr', '14:59', 'time-asr', 'fa-cloud-sun'],
         ['prMaghrib', '17:40', 'time-maghrib', 'fa-cloud-moon'],
         ['prIsha', '19:10', 'time-isha', 'fa-star-and-crescent']
@@ -338,6 +345,19 @@
         ['photo-1486406146926-c627a92ad1ab', 'hpMissionTitle', 'hpMissionText']
     ];
 
+    /* Qatar Visitor Statistics card — DEMO FIGURES ONLY.
+       No dashboard, feed or real numbers have been supplied, so these values are invented
+       placeholders shown behind a "sample data" badge. They are NOT Qatar tourism statistics. */
+    const VISITOR_STATS = {
+        visitorsYtd: 4100000,
+        visitorsMonth: 412000,
+        yoyPct: 12,
+        occupancyPct: 71,
+        stayNights: 3.4,
+        trend: [52, 58, 61, 55, 47, 39, 35, 41, 50, 63, 68, 72],
+        markets: [['vsMarketGcc', 38], ['vsMarketEurope', 22], ['vsMarketAsia', 18], ['vsMarketAmericas', 9], ['vsMarketOther', 13]]
+    };
+
     const panelHead = (title, aside) => `<div class="panel-head">
         <div class="link-text"><span class="vertical-line"></span><h3>${title}</h3></div>
         ${aside ? `<span class="panel-aside">${aside}</span>` : ''}
@@ -351,19 +371,234 @@
         }
     }
 
-    function panelHTML() {
-        const base = today();
-        const dayName = (offset, style) => {
-            const d = new Date(base);
-            d.setDate(d.getDate() + offset);
-            return new Intl.DateTimeFormat(locale(), { weekday: style }).format(d);
-        };
-        const w0 = WEATHER[0];
+    function dayName(offset, style) {
+        const d = today();
+        d.setDate(d.getDate() + offset);
+        return new Intl.DateTimeFormat(locale(), { weekday: style }).format(d);
+    }
 
+    /* ---------- Prayer times (same static data, now also behind the compact widget) ---------- */
+
+    const minutesOf = hhmm => {
+        const [h, m] = hhmm.split(':').map(Number);
+        return h * 60 + m;
+    };
+
+    /* Next prayer from the static times above — no API and no external service.
+       After Isha the next prayer is the following morning's Fajr. */
+    const shownPrayers = () => PRAYERS.filter(p => !p[4]);
+
+    function nextPrayer() {
+        const now = new Date();
+        const mins = now.getHours() * 60 + now.getMinutes();
+        const list = shownPrayers();
+        return list.find(p => minutesOf(p[1]) > mins) || list[0];
+    }
+
+    /* The existing prayer card, unchanged — it now lives inside the compact widget's panel */
+    function prayerCardHTML() {
+        const next = nextPrayer();
+        return `<section class="prayer-card" aria-label="${t('hpPrayer')}">
+            <div class="prayer-card-header">
+                <span class="prayer-card-header-icon"><i class="fa-solid fa-mosque"></i></span>
+                <h3 class="prayer-card-title">${t('hpPrayer')}</h3>
+                <p class="prayer-card-subtitle">${hijriToday()}</p>
+            </div>
+            <div class="times">
+                ${shownPrayers().map(([key, time, cls, ic]) => `<div class="time-item ${cls} ${key === next[0] ? 'is-next' : ''}">
+                    ${key === next[0] ? `<span class="next-flag">${t('prNext')}</span>` : ''}
+                    <span class="time-item-icon"><i class="fa-solid ${ic}"></i></span>
+                    <span class="time-item-name">${t(key)}</span>
+                    <span class="time-item-value">${time}</span>
+                </div>`).join('')}
+            </div>
+            <p class="prayer-source">${t('hpPrayerSource')}</p>
+        </section>`;
+    }
+
+    /* The existing weather card, unchanged — it now lives inside the compact widget's panel */
+    function weatherCardHTML() {
+        const w0 = WEATHER[0];
+        return `<section class="panel-box weather-box" aria-label="${t('hpWeather')}">
+            ${panelHead(t('hpWeather'), `<i class="fa-solid fa-location-dot"></i> ${t('wxCity')}`)}
+            <div class="weather-today">
+                <div>
+                    <p class="weather-today-heading">${t('panelToday')} <span class="weather-day-name">· ${dayName(0, 'long')}</span></p>
+                    <p class="weather-temp">${w0.hi}° <small>/ ${w0.lo}°</small></p>
+                    <p class="weather-label">${t(w0.label)}</p>
+                </div>
+                <i class="fa-solid ${w0.icon} weather-today-icon" aria-hidden="true"></i>
+            </div>
+            <div class="weather-forecast-grid">
+                ${WEATHER.slice(1).map((w, i) => `<div class="weather-forecast-item">
+                    <span class="weather-day-name">${dayName(i + 1, 'short')}</span>
+                    <i class="fa-solid ${w.icon}" aria-hidden="true"></i>
+                    <span class="weather-temp-range">${w.hi}° <span class="low">/ ${w.lo}°</span></span>
+                </div>`).join('')}
+            </div>
+        </section>`;
+    }
+
+    /* ---------- Compact top strip: Theme of the Month ticker + prayer / weather widgets ---------- */
+
+    /* The message is repeated TICKER_COPIES times and the track slides by exactly one copy
+       (1 / TICKER_COPIES = 12.5%), so the loop is seamless and the strip is never half empty. */
+    const TICKER_COPIES = 8;
+
+    function tickerHTML() {
+        const message = esc(t('hpThemeMessage'));
+        const items = Array.from({ length: TICKER_COPIES }, (v, i) =>
+            `<span class="ticker-item"${i ? ' aria-hidden="true"' : ''}>${message}</span>`).join('');
+        return `<div class="ticker" aria-label="${esc(t('hpTheme'))}">
+            <span class="ticker-label"><i class="fa-solid fa-bullseye" aria-hidden="true"></i>${t('hpTheme')}</span>
+            <div class="ticker-viewport">
+                <div class="ticker-track">${items}</div>
+            </div>
+        </div>`;
+    }
+
+    function utilBarHTML() {
+        const next = nextPrayer();
+        const w0 = WEATHER[0];
+        return `<div class="util-bar">
+            ${PAGE === 'home' ? tickerHTML() : ''}
+            <div class="util-widgets">
+                <div class="util-widget" data-widget="prayer">
+                    <button type="button" class="util-chip" data-widget-toggle aria-expanded="false" aria-controls="prayerPanel" title="${esc(t('wgPrayerOpen'))}">
+                        <span class="util-chip-icon"><i class="fa-solid fa-mosque" aria-hidden="true"></i></span>
+                        <span class="util-chip-text"><small>${t(next[0])}</small><strong class="num">${next[1]}</strong></span>
+                        <i class="fa-solid fa-chevron-down util-chip-caret" aria-hidden="true"></i>
+                        <span class="sr-only">${t('wgPrayerOpen')}</span>
+                    </button>
+                    <div class="util-pop" id="prayerPanel" hidden>${prayerCardHTML()}</div>
+                </div>
+                <div class="util-widget" data-widget="weather">
+                    <button type="button" class="util-chip" data-widget-toggle aria-expanded="false" aria-controls="weatherPanel" title="${esc(t('wgWeatherOpen'))}">
+                        <span class="util-chip-icon"><i class="fa-solid ${w0.icon}" aria-hidden="true"></i></span>
+                        <span class="util-chip-text"><strong class="num ltr">${w0.hi}°C</strong></span>
+                        <i class="fa-solid fa-chevron-down util-chip-caret" aria-hidden="true"></i>
+                        <span class="sr-only">${t('wgWeatherOpen')}</span>
+                    </button>
+                    <div class="util-pop" id="weatherPanel" hidden>${weatherCardHTML()}</div>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    function closeWidgets(except) {
+        $$('.util-widget').forEach(w => {
+            if (w === except) return;
+            const pop = $('.util-pop', w);
+            const btn = $('[data-widget-toggle]', w);
+            if (pop) pop.hidden = true;
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+            w.classList.remove('is-open');
+        });
+    }
+
+    function toggleWidget(btn) {
+        const widget = btn.closest('.util-widget');
+        const pop = $('.util-pop', widget);
+        if (!pop) return;
+        const open = pop.hidden;
+        closeWidgets(widget);
+        pop.hidden = !open;
+        btn.setAttribute('aria-expanded', String(open));
+        widget.classList.toggle('is-open', open);
+    }
+
+    /* ---------- Qatar Visitor Statistics (prototype dashboard preview, demo numbers) ---------- */
+
+    const fmtCompact = n => {
+        try {
+            return new Intl.NumberFormat(locale(), { notation: 'compact', maximumFractionDigits: 1 }).format(n);
+        } catch (e) {
+            return String(n);
+        }
+    };
+
+    function sparkline(values) {
+        const max = Math.max.apply(null, values);
+        return `<span class="vs-spark" aria-hidden="true">${values.map(v => `<span style="height:${Math.round(v / max * 100)}%"></span>`).join('')}</span>`;
+    }
+
+    function visitorStatsHTML() {
+        const S = VISITOR_STATS;
+        return `<section class="panel-box vs-box" aria-label="${t('vsTitle')}">
+            ${panelHead(t('vsTitle'), `<span class="vs-demo">${t('sampleData')}</span>`)}
+            <button type="button" class="vs-card" data-visitor-stats aria-haspopup="dialog">
+                <span class="vs-hero">
+                    <span class="vs-hero-value num ltr">${fmtCompact(S.visitorsYtd)}</span>
+                    <span class="vs-hero-label">${t('vsVisitors')} · ${t('vsPeriod')}</span>
+                </span>
+                ${sparkline(S.trend)}
+                <span class="vs-mini">
+                    <span class="vs-mini-item"><small>${t('vsMonth')}</small><b class="num ltr">${fmtCompact(S.visitorsMonth)}</b></span>
+                    <span class="vs-mini-item"><small>${t('vsYoY')}</small><b class="num ltr vs-up"><i class="fa-solid fa-arrow-trend-up"></i> ${S.yoyPct}%</b></span>
+                </span>
+                <span class="vs-open">${t('vsOpen')} <i class="fa-solid fa-arrow-left dir-flip" aria-hidden="true"></i></span>
+            </button>
+        </section>`;
+    }
+
+    function openVisitorStats() {
+        const S = VISITOR_STATS;
+        const max = Math.max.apply(null, S.trend);
+        const months = S.trend.map((v, i) => {
+            const d = today();
+            d.setDate(1);
+            d.setMonth(d.getMonth() - (S.trend.length - 1 - i));
+            return { label: new Intl.DateTimeFormat(locale(), { month: 'short' }).format(d), value: v };
+        });
+        const kpi = (label, value, sub) => `<div class="vs-kpi">
+            <span class="vs-kpi-label">${label}</span>
+            <strong class="vs-kpi-value num ltr">${value}</strong>
+            ${sub ? `<span class="vs-kpi-sub">${sub}</span>` : ''}
+        </div>`;
+
+        openModal({
+            title: `${esc(t('vsTitle'))} <span class="tag tag-amber"><i class="fa-solid fa-flask"></i>${t('sampleData')}</span>`,
+            size: 'lg',
+            body: `<div class="vs-modal">
+                <div class="vs-kpis">
+                    ${kpi(t('vsVisitors'), fmtCompact(S.visitorsYtd), t('vsPeriod'))}
+                    ${kpi(t('vsMonth'), fmtCompact(S.visitorsMonth), `<span class="vs-up"><i class="fa-solid fa-arrow-trend-up"></i> ${S.yoyPct}% ${t('vsYoY')}</span>`)}
+                    ${kpi(t('vsOccupancy'), S.occupancyPct + '%')}
+                    ${kpi(t('vsStay'), String(S.stayNights), t('vsNights'))}
+                </div>
+                <div class="vs-panels">
+                    <div class="vs-panel">
+                        <h4>${t('vsTrend')}</h4>
+                        <div class="vs-bars">
+                            ${months.map(m => `<div class="vs-bar"><span style="height:${Math.round(m.value / max * 100)}%"></span><small>${esc(m.label)}</small></div>`).join('')}
+                        </div>
+                    </div>
+                    <div class="vs-panel">
+                        <h4>${t('vsMarkets')}</h4>
+                        <ul class="vs-markets">
+                            ${S.markets.map(([key, pct]) => `<li>
+                                <span class="vs-market-name">${t(key)}</span>
+                                <span class="vs-market-track"><span style="width:${pct}%"></span></span>
+                                <span class="vs-market-val num ltr">${pct}%</span>
+                            </li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+                <p class="vs-note"><i class="fa-solid fa-flask"></i>${t('vsDisclaimer')}</p>
+            </div>`,
+            footer: `<button type="button" class="btn btn-outline btn-sm" data-modal-close>${t('close')}</button>`
+        });
+    }
+
+    /* ---------- Side panel: vision & mission · visitor statistics · links · hotlines ---------- */
+
+    function panelHTML() {
+        /* Compact link tiles (small icon + short label): the Option 1 "Software & System Links"
+           presentation the client preferred, rebuilt with Option 2's own tokens and classes. */
         const linkItem = item => {
             const url = item.page ? href(item.page, item.params) : item.url;
             const ext = item.external ? ' target="_blank" rel="noopener noreferrer"' : '';
-            return `<li><a href="${url}"${ext}>
+            return `<li><a class="link-tile" href="${url}"${ext} title="${esc(t(item.key))}">
                 <span class="link-icon"><i class="${item.icon}"></i></span><span class="link-label">${t(item.key)}</span></a></li>`;
         };
 
@@ -382,47 +617,13 @@
                 </div>
             </section>
 
+            ${visitorStatsHTML()}
+
             <section class="links-section" aria-label="${t('hpSystems')}">
                 ${panelHead(t('hpSystems'))}
-                <ul class="links-list">
+                <ul class="links-grid">
                     ${LINKS.map(linkItem).join('')}
                 </ul>
-            </section>
-
-            <section class="panel-box weather-box" aria-label="${t('hpWeather')}">
-                ${panelHead(t('hpWeather'), `<i class="fa-solid fa-location-dot"></i> ${t('wxCity')}`)}
-                <div class="weather-today">
-                    <div>
-                        <p class="weather-today-heading">${t('panelToday')} <span class="weather-day-name">· ${dayName(0, 'long')}</span></p>
-                        <p class="weather-temp">${w0.hi}° <small>/ ${w0.lo}°</small></p>
-                        <p class="weather-label">${t(w0.label)}</p>
-                    </div>
-                    <i class="fa-solid ${w0.icon} weather-today-icon" aria-hidden="true"></i>
-                </div>
-                <div class="weather-forecast-grid">
-                    ${WEATHER.slice(1).map((w, i) => `<div class="weather-forecast-item">
-                        <span class="weather-day-name">${dayName(i + 1, 'short')}</span>
-                        <i class="fa-solid ${w.icon}" aria-hidden="true"></i>
-                        <span class="weather-temp-range">${w.hi}° <span class="low">/ ${w.lo}°</span></span>
-                    </div>`).join('')}
-                </div>
-            </section>
-
-            <section class="prayer-card" aria-label="${t('hpPrayer')}">
-                <div class="prayer-card-header">
-                    <span class="prayer-card-header-icon"><i class="fa-solid fa-mosque"></i></span>
-                    <h3 class="prayer-card-title">${t('hpPrayer')}</h3>
-                    <p class="prayer-card-subtitle">${hijriToday()}</p>
-                </div>
-                <div class="times">
-                    ${PRAYERS.map(([key, time, cls, ic, next]) => `<div class="time-item ${cls} ${next ? 'is-next' : ''}">
-                        ${next ? `<span class="next-flag">${t('prNext')}</span>` : ''}
-                        <span class="time-item-icon"><i class="fa-solid ${ic}"></i></span>
-                        <span class="time-item-name">${t(key)}</span>
-                        <span class="time-item-value">${time}</span>
-                    </div>`).join('')}
-                </div>
-                <p class="prayer-source">${t('hpPrayerSource')}</p>
             </section>
 
             <section class="panel-box" aria-label="${t('navHotlines')}">
@@ -477,7 +678,7 @@
         (D.certificates || []).forEach(c => add('documents', 'fa-solid fa-certificate', { ar: `${c.standard} — ${c.title.ar}`, en: `${c.standard} — ${c.title.en}` }, t('navCerts'), href('certificates', { cert: c.id })));
         (D.albums || []).forEach(a => add('images', 'fa-regular fa-image', a.title, `${t('navPhotos')} · ${t('pgPhotos', { n: a.photos.length })}`, href('album', { id: a.id })));
         (D.videos || []).forEach(v => add('videos', 'fa-regular fa-circle-play', v.title, `${t('navVideos')} · ${v.length}`, href('video-library', { id: v.id })));
-        (D.guides || []).forEach(g => {
+        (D.guides || []).filter(g => !g.hidden && !((D.guideSystems || []).find(x => x.key === g.system) || {}).hidden).forEach(g => {
             const type = g.kind === 'video' ? 'videos' : g.kind === 'image' ? 'images' : 'pages';
             const ic = g.kind === 'video' ? 'fa-regular fa-circle-play' : g.kind === 'image' ? 'fa-regular fa-image' : 'fa-solid fa-arrow-up-right-from-square';
             add(type, ic, g.title, t('navUserGuide'), href('user-guide', { id: g.id }));
@@ -560,6 +761,10 @@
         }
     }
 
+    /* Desktop default is EXPANDED; the hamburger collapses it. The choice is kept for the
+       current page only, so every page opens with the menu visible. */
+    let desktopCollapsed = false;
+
     function setSidebarCollapsed(collapsed) {
         document.body.classList.toggle('nav-collapsed', collapsed);
         const sidebar = $('#siteMenu');
@@ -597,8 +802,8 @@
                     setMenu(!document.body.classList.contains('menu-open'));
                     return;
                 }
-                const collapsed = document.body.classList.contains('nav-collapsed');
-                setSidebarCollapsed(!collapsed);
+                desktopCollapsed = !document.body.classList.contains('nav-collapsed');
+                setSidebarCollapsed(desktopCollapsed);
             });
         }
 
@@ -680,20 +885,18 @@
         $('#siteHeader').innerHTML = headerHTML();
         $('#siteMenu').innerHTML = menuHTML();
         bindHeader();
+        $('#utilBar').innerHTML = utilBarHTML();
         $('#sidePanel').innerHTML = panelHTML();
         $('#siteFooter').innerHTML = footerHTML();
         startVision();
-        if (window.innerWidth <= 1024) {
-            setSidebarCollapsed(false);
-        } else {
-            setSidebarCollapsed(true);
-        }
+        setSidebarCollapsed(window.innerWidth <= 1024 ? false : desktopCollapsed);
     }
 
     function mountShell() {
         document.body.insertAdjacentHTML('afterbegin', `
             <div class="qt-page">
                 <header class="header" id="siteHeader"></header>
+                <div class="util-wrap" id="utilBar"></div>
                 <aside class="sidebar-left" id="siteMenu"></aside>
                 <main class="content" id="pageContent"></main>
                 <aside class="sidebar-right" id="sidePanel"></aside>
@@ -890,6 +1093,21 @@
             }
             if (e.target.closest('#menuBackdrop')) { setMenu(false); return; }
 
+            /* Compact prayer / weather widgets at the top of the page */
+            const widgetBtn = e.target.closest('[data-widget-toggle]');
+            if (widgetBtn) {
+                e.preventDefault();
+                toggleWidget(widgetBtn);
+                return;
+            }
+            if (!e.target.closest('.util-pop')) closeWidgets();
+
+            if (e.target.closest('[data-visitor-stats]')) {
+                e.preventDefault();
+                openVisitorStats();
+                return;
+            }
+
             const toastBtn = e.target.closest('[data-toast]');
             if (toastBtn) {
                 e.preventDefault();
@@ -935,6 +1153,7 @@
         document.addEventListener('keydown', e => {
             if (e.key === 'Escape') {
                 closeModal();
+                closeWidgets();
                 closeSearchPanel();
                 if (compactSearchQuery.matches) setCompactSearch(false);
                 closeProfileMenu();
@@ -962,9 +1181,10 @@
         }, { passive: true });
 
         window.addEventListener('resize', () => {
+            closeWidgets();
             if (window.innerWidth > 1024) {
                 setMenu(false);
-                if (!document.body.classList.contains('nav-collapsed')) setSidebarCollapsed(true);
+                setSidebarCollapsed(desktopCollapsed);
             } else {
                 setSidebarCollapsed(false);
             }

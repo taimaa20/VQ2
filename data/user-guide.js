@@ -1,12 +1,14 @@
 /* User Guide for each system (BRD 6.11 & 8.9)
-   systems: the same systems linked from the homepage "Software & System Links" */
+   systems: the same systems linked from the homepage "Software & System Links"
+   hidden: true -> kept in the prototype data but not shown anywhere in the UI.
+   Tawasol is hidden at the client's request; remove the flag to bring it back. */
 window.VQData = window.VQData || {};
 
 VQData.guideSystems = [
     { key: 'intranet', icon: 'fa-house-laptop', url: '../index.html', name: { ar: 'البوابة الداخلية', en: 'Intranet Portal' } },
     { key: 'explorer', icon: 'fa-desktop', url: 'https://visitqatar.com', name: { ar: 'بوابة المستكشف', en: 'Explorer Portal' } },
     { key: 'hr', icon: 'fa-users', url: 'https://www.office.com', name: { ar: 'نظام موارد HR', en: 'HR System' } },
-    { key: 'tawasol', icon: 'fa-headset', url: 'https://teams.microsoft.com', name: { ar: 'نظام تواصل', en: 'Tawasol Support System' } },
+    { key: 'tawasol', hidden: true, icon: 'fa-headset', url: 'https://teams.microsoft.com', name: { ar: 'نظام تواصل', en: 'Tawasol Support System' } },
     { key: 'elicensing', icon: 'fa-file-contract', url: 'https://login.microsoftonline.com', name: { ar: 'التراخيص الإلكترونية', en: 'E-Licensing' } }
 ];
 
@@ -58,7 +60,7 @@ VQData.guides = [
         ]
     },
     {
-        id: 'tawasol-guide', system: 'tawasol', kind: 'video', length: '03:45', image: 'photo-1556742049-0cfed4f6a45d',
+        id: 'tawasol-guide', system: 'tawasol', hidden: true, kind: 'video', length: '03:45', image: 'photo-1556742049-0cfed4f6a45d',
         title: { ar: 'دليل نظام تواصل', en: 'Tawasol system guide' },
         description: { ar: 'كيفية رفع طلب دعم ومتابعته عبر نظام تواصل.', en: 'How to raise and follow a support request in Tawasol.' }
     },

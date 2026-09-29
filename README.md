@@ -47,8 +47,9 @@ teal menu; page content; side panel; footer under content and panel.
 | Area | SPFx component | Content (Option 1) |
 |---|---|---|
 | Header | `TopBar` | Logo, Photo Gallery, Video Gallery, search with type filters, text size (T−/T+), language, user photo/name/title/department, sign-out icon |
-| Menu | `RightSidebar` | Teal gradient, amber top line, white active tab. Home, Departments, Announcements, Discounts, Certificates, Awards, Events, News, Survey, Policies, Hotlines, Courses, User Guide, Employee Directory |
-| Side panel | `RightPanel` | In Option 1 order: weather, prayer times (next prayer marked), programs & system links, message/vision/mission (SPFx vision carousel), structure & guide, hotlines |
+| Menu | `RightSidebar` | Teal gradient, amber top line, white active tab. **Expanded by default on desktop**; the hamburger collapses it to icons. Home, Departments, Announcements, Discounts, Certificates, Awards, Events, News, Survey, Policies, Hotlines, Photo Gallery, Video Gallery, Courses, User Guide, VQ Structure, Employee Directory |
+| Top strip | — | Under the header on every page: Theme of the Month ticker (home only, static message, right-to-left) and two compact widgets — next prayer + time, and the current temperature. Each opens the existing prayer / weather card in a small panel. |
+| Side panel | `RightPanel` | Vision & mission (SPFx vision carousel), Qatar Visitor Statistics (demo card + dashboard-preview popup), programs & system links (compact icon tiles), hotlines |
 | Footer | `FooterBar` | Social links, copyright, certificate logos |
 
 Content rule: each page has one breadcrumb pill, then **one white surface**. Sections inside it are separated
@@ -58,7 +59,7 @@ by a ruby-underlined heading and a divider, not by separate cards.
 
 | Page | Option 1 content kept | Built from SPFx |
 |---|---|---|
-| Home | Latest Updates (4) → Events (list / calendar) → Latest Discounts (4) → Latest News (6) | `HomePage`: `offers-header-of` headings with ruby "show more", news-card for updates, event listing-card carousel (2 per view), offer cards, news-card carousel |
+| Home | Internal Comms Circulars (4) + Employee Relations Circulars (4) → VQ Calendar → VQ & QT Events → Tradeshows & Roadshows → Latest News (6) → Discounts repository (4) | `HomePage`: `offers-header-of` headings with ruby "show more", two circular boxes split by publishing team, event listing-card carousel (2 per view), offer cards, news-card carousel |
 | Announcements · details | Search, type filter, 6 per page · type, number, dates, body, attachment preview, related link | `AdsPage` listing rows · `DetailsPage` (title, ruby date, image, facts, inline document, back pill) |
 | Events · details | Search, category, date range, list / month calendar, next event, 4 per page · dates, location, facts, album link | `AdsPage` + `NewHomePage` arch banner for the next event · `DetailsPage` with (From)–(To) dates |
 | Discounts · details | Search, category, percentage, partner, expiry, 6 per page · terms, time left, offer document | `AdsPage` discount category tabs and card grid · `DetailsPage` |
@@ -74,7 +75,7 @@ by a ruby-underlined heading and a divider, not by separate cards.
 | Survey | Quick polls with results, in-depth survey form | No SPFx page. Built from `HotlinesPage` tabs, category-tab options, popup form |
 | Photo Gallery · album | Search, albums, full-size viewer | TopBar gallery page, `AdsPage` card grid · `DetailsPage` |
 | Video Gallery | Now playing, search, category, grid | TopBar gallery page, `DetailsPage` media frame, `AdsPage` card grid |
-| Structure & Guide | Chart, structure file | `DetailsPage` vocabulary (opened from the side panel, not a menu item) |
+| Structure & Guide | Chart, structure file | `DetailsPage` vocabulary (BRD 6.1.10; reached from the **VQ Structure** menu item) |
 | Discussion Board | Anonymous / alias posting, replies, likes, poll | Popup form rows, category tabs (not a menu item) |
 | Search | Query, type filters, results | `SearchResultsPage` |
 
@@ -84,6 +85,7 @@ by a ruby-underlined heading and a divider, not by separate cards.
 - **Events:** no map or map placeholder anywhere. The Home calendar is a month view plus that month's events.
 - **Details pages:** no share, add-to-calendar, registration, favourite or save actions.
 - **Survey:** quick polls and in-depth surveys sit on two tabs instead of one stacked page.
-- **Side panel:** the weather shows a 6-day forecast (SPFx pattern) instead of 4 days. Message, vision and mission rotate in the SPFx carousel.
+- **Side panel:** message, vision and mission rotate in the SPFx carousel. Weather (6-day forecast) and prayer times moved out of the panel into the compact top widgets; a Qatar Visitor Statistics card sits under vision & mission.
+- **Prototype data:** the Visitor Statistics figures are invented demo values behind a "sample data" badge — not Qatar tourism statistics. Tawasol is hidden (`hidden: true` in `data/user-guide.js`), not deleted.
 - **Header:** adds the SPFx sign-out icon, which only shows a notice.
 - **SPFx items left out because Option 1 does not have them:** the Home banner slider and the separate announcements / circulars blocks. Home keeps Option 1's four sections.

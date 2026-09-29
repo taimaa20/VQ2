@@ -1,81 +1,75 @@
 /* Home — SPFx HomePage web part composition:
-   Circulars → VQ Calendar → VQ & QC Events → Tradeshows & Roadshows → Latest News → Discounts
-   (vision & mission, links, weather, prayer times and hotlines live in the shared side panel) */
+   Internal Comms / Employee Relations circulars → VQ Calendar → VQ & QT Events →
+   Tradeshows & Roadshows → Latest News → Discounts repository
+   (Theme of the Month ticker and the compact prayer / weather widgets sit in the shell strip
+   above; vision & mission, visitor statistics, links and hotlines live in the side panel) */
 (function () {
     const { t, tx, esc, ui, D } = VQ;
 
     /* VQ public events first, then QC staff events. Shows live in their own section. */
     const EVENT_IDS = ['global-perspectives', 'partners-forum', 'standup-taha', 'forbes-workshop'];
     const DISCOUNT_IDS = ['pearl-gewan', 'restaurants', 'culture-tickets', 'fitness'];
-    const ROTATE_MS = 7000;
 
-    const s = { update: 0, day: null, paused: false };
-    let timer = null;
+    const s = { day: null };
 
     const byDateDesc = key => (a, b) => b[key].localeCompare(a[key]);
-    const updates = () => D.announcements.slice().sort(byDateDesc('start')).slice(0, 4);
     const homeEvents = () => EVENT_IDS.map(id => D.events.find(e => e.id === id)).filter(Boolean);
     const homeShows = () => D.events.filter(e => e.group === 'shows').slice().sort((a, b) => b.start.localeCompare(a.start)).slice(0, 4);
     const homeDiscounts = () => DISCOUNT_IDS.map(id => D.discounts.find(d => d.id === id)).filter(Boolean);
     const homeNews = () => D.news.slice().sort(byDateDesc('date')).slice(0, 6);
     const catOf = (list, key) => list.find(c => c.key === key);
 
-    /* ---------- 1 · Announcements: featured circular + index of the latest four ---------- */
+    /* ---------- 1 · Circulars: two separate boxes, one per publishing team ----------
+       Left  = Internal Comms (PR / Communications)   right = Employee Relations (HR).
+       Both read the existing /data/announcements.js entries through their `owner` field.
+       Which circular belongs to which box is PROTOTYPE MOCK DATA, not a confirmed business
+       rule — see the note at the top of /data/announcements.js. Both "Show All" links go to
+       the existing Announcements page; no owner filtering was added there. */
 
-    function featureHTML(a) {
+    const CIRCULAR_BOXES = [
+        { owner: 'comms', title: 'hpCircComms', sub: 'hpCircCommsOwner', icon: 'fa-bullhorn', cls: 'is-comms' },
+        { owner: 'er', title: 'hpCircEr', sub: 'hpCircErOwner', icon: 'fa-user-group', cls: 'is-er' }
+    ];
+
+    const circularsOf = owner => D.announcements.filter(a => a.owner === owner).sort(byDateDesc('start')).slice(0, 4);
+
+    /* Same card composition as the Announcements listing page: the circular artwork that the
+       type already carries (general.png / ceo.png / death.png / HR.png), the coloured type
+       strip, the type tag and circular number, then the title and the date. */
+    function circularCard(a) {
         const ty = ui.typeOfAnnouncement(a.type);
-        return `<a href="${VQ.href('announcement-details', { id: a.id })}" class="news-card updates-feature" style="--type-color:${ty.color};--type-on:${ty.on || '#fff'}">
-            <div class="news-image-wrapper"><div class="news-image">${VQ.img(ty.image, '', 900, tx(ty.label))}</div></div>
-            <div class="news-content">
-                <div class="card-chips">${ui.typeTag(ty)}${ui.tag(`<span class="ltr">${a.number}</span>`, 'outline')}</div>
-                <p class="news-date">${VQ.icon('calendar')}${VQ.fmtCardDate(a.start)}</p>
-                <h3 class="news-title">${esc(tx(a.title))}</h3>
-                <p class="news-description">${esc(tx(a.summary))}</p>
-                <div class="more-row"><span class="more-link">${t('viewDetails')} ${ui.arrow()}</span></div>
-            </div>
-        </a>`;
-    }
-
-    function updatesHTML() {
-        const list = updates();
-        return ui.section(
-            ui.sectionHead({ title: t('hpUpdates'), link: VQ.href('announcements'), linkLabel: t('showAll') }) +
-            `<div class="updates ${s.paused ? 'is-paused' : ''}" id="updates">
-                <div id="updateFeature">${featureHTML(list[s.update])}</div>
-                <div class="updates-index" role="tablist" aria-label="${t('hpUpdates')}">
-                    ${list.map((a, i) => {
-                        const ty = ui.typeOfAnnouncement(a.type);
-                        return `<button type="button" role="tab" class="update-tab ${i === s.update ? 'active' : ''}" style="--type-color:${ty.color}" data-update="${i}" aria-selected="${i === s.update}">
-                            <span class="update-tab-type"><span>${tx(ty.label)}</span><span>${VQ.fmtDate(a.start, 'short')}</span></span>
-                            <span class="update-tab-title">${esc(tx(a.title))}</span>
-                            <span class="update-progress"></span>
-                        </button>`;
-                    }).join('')}
-                </div>
-            </div>`,
-            'section-announcements'
-        );
-    }
-
-    function showUpdate(i) {
-        const list = updates();
-        s.update = (i + list.length) % list.length;
-        const feature = VQ.$('#updateFeature');
-        if (!feature) return;
-        feature.firstElementChild.classList.add('is-fading');
-        setTimeout(() => { feature.innerHTML = featureHTML(list[s.update]); }, 180);
-        VQ.$$('.update-tab').forEach((tab, n) => {
-            const on = n === s.update;
-            tab.classList.remove('active');
-            tab.setAttribute('aria-selected', String(on));
-            if (on) { void tab.offsetWidth; tab.classList.add('active'); }
+        return ui.listingCard({
+            url: VQ.href('announcement-details', { id: a.id }),
+            image: ty.image,
+            overlay: `<span class="type-strip" style="background:${ty.color}"></span>`,
+            chips: ui.typeTag(ty) + ui.tag(`<span class="ltr">${esc(a.number)}</span>`, 'outline'),
+            title: esc(tx(a.title)),
+            meta: `<span>${VQ.icon('calendar')}${VQ.fmtCardDate(a.start)}</span>`,
+            button: false
         });
     }
 
-    function startRotation() {
-        clearInterval(timer);
-        timer = setInterval(() => { if (!s.paused) showUpdate(s.update + 1); }, ROTATE_MS);
+    function circularBox(box) {
+        const list = circularsOf(box.owner);
+        return `<section class="circular-box ${box.cls}" aria-label="${esc(t(box.title))}">
+            <header class="circular-box-head">
+                <span class="circular-box-icon"><i class="fa-solid ${box.icon}"></i></span>
+                <span class="circular-box-titles">
+                    <h3>${t(box.title)}</h3>
+                    <p>${t(box.sub)}</p>
+                </span>
+                <a class="show-more" href="${VQ.href('announcements')}">${t('showAll')} ${ui.arrow()}</a>
+            </header>
+            ${list.length
+                ? `<div class="circular-cards">${list.map(circularCard).join('')}</div>`
+                : `<p class="circular-empty">${t('hpCircEmpty')}</p>`}
+        </section>`;
     }
+
+    const circularsHTML = () => ui.section(
+        `<div class="circulars-grid">${CIRCULAR_BOXES.map(circularBox).join('')}</div>`,
+        'section-circulars'
+    );
 
     /* ---------- VQ Calendar, then QC Events (separate sections, no view switch) ---------- */
 
@@ -168,6 +162,7 @@
     function discountsHTML() {
         return ui.section(
             ui.sectionHead({ title: t('hpDiscounts'), link: VQ.href('discounts') }) +
+            `<p class="section-desc">${t('hpDiscountsDesc')}</p>` +
             `<div class="offers-grid">
                 ${homeDiscounts().map(d => {
                     const cat = catOf(D.discountCategories, d.category);
@@ -210,35 +205,12 @@
 
         render() {
             ui.unmountCalendarMaps(VQ.$('#pageContent'));
-            VQ.content(`<h1 class="sr-only">${t('navHome')}</h1><div class="page-surface home-surface">${updatesHTML()}${calendarSection()}${eventsSection()}${showsSection()}${newsHTML()}${discountsHTML()}</div>`);
+            VQ.content(`<h1 class="sr-only">${t('navHome')}</h1><div class="page-surface home-surface">${circularsHTML()}${calendarSection()}${eventsSection()}${showsSection()}${newsHTML()}${discountsHTML()}</div>`);
             ui.mountCalendarMaps(VQ.$('#pageContent'));
-            startRotation();
         },
 
         setup(root) {
-            let featureSwipe = null;
-            root.addEventListener('touchstart', e => {
-                if (!e.target.closest('#updateFeature')) return;
-                const touch = e.changedTouches[0];
-                featureSwipe = { x: touch.clientX, y: touch.clientY };
-            }, { passive: true });
-            root.addEventListener('touchend', e => {
-                if (!featureSwipe) return;
-                const touch = e.changedTouches[0];
-                const dx = touch.clientX - featureSwipe.x;
-                const dy = touch.clientY - featureSwipe.y;
-                featureSwipe = null;
-                if (Math.abs(dx) < 42 || Math.abs(dx) < Math.abs(dy)) return;
-                const rtl = document.documentElement.dir === 'rtl';
-                const next = rtl ? dx > 0 : dx < 0;
-                showUpdate(s.update + (next ? 1 : -1));
-                startRotation();
-            }, { passive: true });
-
             root.addEventListener('click', e => {
-                const tab = e.target.closest('[data-update]');
-                if (tab) { showUpdate(Number(tab.dataset.update)); startRotation(); return; }
-
                 const day = e.target.closest('[data-cal-day]');
                 if (day) {
                     s.day = day.dataset.calDay && day.dataset.calDay !== s.day ? day.dataset.calDay : null;
@@ -246,19 +218,6 @@
                     ui.unmountCalendarMaps(body);
                     body.innerHTML = calendarHTML();
                     ui.mountCalendarMaps(body);
-                }
-            });
-            root.addEventListener('mouseleave', () => {
-                s.paused = false;
-                const box = VQ.$('#updates');
-                if (box) box.classList.remove('is-paused');
-            });
-            root.addEventListener('mouseover', e => {
-                const inside = !!e.target.closest('#updates');
-                if (inside !== s.paused) {
-                    s.paused = inside;
-                    const box = VQ.$('#updates');
-                    if (box) box.classList.toggle('is-paused', inside);
                 }
             });
         }

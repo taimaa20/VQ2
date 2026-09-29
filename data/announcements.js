@@ -1,4 +1,11 @@
 /* Announcements / Circulars (BRD 7.2 & 8.6)
+   owner: 'comms' (PR / Internal Communications) or 'er' (HR / Employee Relations).
+          PROTOTYPE MOCK CATEGORISATION — NOT a confirmed business rule. The client has not
+          supplied an ownership mapping, so each value below is a provisional guess made for
+          the demo. To change the split, edit the owner value on the circular; to change the
+          boxes themselves, edit CIRCULAR_BOXES in assets/js/pages/home.js.
+          It drives the two homepage circular boxes only — the Announcements page still
+          lists every circular regardless of owner.
    Types use the secondary palette (Brand Guidelines 2025, screen values):
    general royal teal #00626C · ceo cocoa #5A4B4A · hr crimson #AF1B3F · obituary aubergine #31263E
    image: the circular artwork already used on the homepage */
@@ -16,6 +23,7 @@ VQData.announcements = [
         id: 'ceo-fiscal-year',
         number: 'VQ-CIR-2026-091',
         type: 'ceo',
+        owner: 'comms',
         start: '2026-09-12',
         end: '2026-10-12',
         issuer: { ar: 'مكتب الرئيس التنفيذي', en: 'CEO Office' },
@@ -32,6 +40,7 @@ VQData.announcements = [
         id: 'ac-temperature',
         number: 'VQ-CIR-2026-088',
         type: 'general',
+        owner: 'comms',
         start: '2026-09-11',
         end: '2026-10-31',
         issuer: { ar: 'قسم الخدمات الإدارية', en: 'Administrative Services' },
@@ -50,6 +59,7 @@ VQData.announcements = [
         id: 'condolence-almarri',
         number: 'VQ-CIR-2026-087',
         type: 'obituary',
+        owner: 'er',
         start: '2026-09-10',
         end: '2026-09-17',
         issuer: { ar: 'إدارة الموارد البشرية', en: 'Human Resources' },
@@ -65,6 +75,7 @@ VQData.announcements = [
         id: 'annual-leave-update',
         number: 'VQ-CIR-2026-085',
         type: 'hr',
+        owner: 'er',
         start: '2026-09-09',
         end: '2026-12-31',
         issuer: { ar: 'إدارة الموارد البشرية', en: 'Human Resources' },
@@ -78,9 +89,27 @@ VQData.announcements = [
         link: { page: 'policies', label: { ar: 'فتح السياسات العامة', en: 'Open General Policies' } }
     },
     {
+        id: 'er-service-hours',
+        number: 'VQ-CIR-2026-083',
+        type: 'hr',
+        owner: 'er',
+        start: '2026-09-08',
+        end: '2026-11-30',
+        issuer: { ar: 'إدارة الموارد البشرية — علاقات الموظفين', en: 'Human Resources — Employee Relations' },
+        title: { ar: 'قنوات التواصل مع علاقات الموظفين', en: 'Employee Relations contact channels' },
+        summary: { ar: 'كيفية التواصل مع فريق علاقات الموظفين وتقديم الطلبات.', en: 'How to reach the Employee Relations team and submit a request.' },
+        body: [
+            { ar: 'الزملاء الأعزاء،', en: 'Dear colleagues,' },
+            { ar: 'يمكنكم التواصل مع فريق علاقات الموظفين بشأن الطلبات والاستفسارات المتعلقة بالخدمات الوظيفية.', en: 'You can contact the Employee Relations team for requests and questions about employee services.' },
+            { ar: 'النماذج المطلوبة متاحة في صفحة السياسات والإجراءات والنماذج.', en: 'The required forms are available on the Policies, Procedures and Forms page.' }
+        ],
+        link: { page: 'policies', label: { ar: 'فتح النماذج والقوالب', en: 'Open forms & templates' } }
+    },
+    {
         id: 'survey-reminder',
         number: 'VQ-CIR-2026-081',
         type: 'hr',
+        owner: 'er',
         start: '2026-09-06',
         end: '2026-09-30',
         issuer: { ar: 'إدارة الموارد البشرية', en: 'Human Resources' },
@@ -96,6 +125,7 @@ VQData.announcements = [
         id: 'intranet-launch',
         number: 'VQ-CIR-2026-079',
         type: 'general',
+        owner: 'comms',
         start: '2026-09-01',
         end: '2026-10-01',
         issuer: { ar: 'العلاقات العامة والاتصال', en: 'PR & Communications' },
@@ -111,6 +141,7 @@ VQData.announcements = [
         id: 'staff-discounts',
         number: 'VQ-CIR-2026-074',
         type: 'general',
+        owner: 'comms',
         start: '2026-08-24',
         end: '2026-12-31',
         issuer: { ar: 'العلاقات العامة والاتصال', en: 'PR & Communications' },
@@ -126,6 +157,7 @@ VQData.announcements = [
         id: 'certificates-published',
         number: 'VQ-CIR-2026-066',
         type: 'general',
+        owner: 'comms',
         start: '2026-08-12',
         end: '2026-09-12',
         issuer: { ar: 'العلاقات العامة والاتصال', en: 'PR & Communications' },

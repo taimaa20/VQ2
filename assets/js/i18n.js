@@ -338,8 +338,44 @@ window.VQ_I18N = {
         hpViewList: 'قائمة',
         hpViewCalendar: 'تقويم',
         hpDiscounts: 'الخصومات',
+        hpDiscountsDesc: 'مستودع الخصومات وعروض الشركاء المتاحة للموظفين.',
         hpNews: 'آخر الأخبار',
         hpHotlines: 'الخطوط الساخنة',
+
+        /* شريط محور الشهر (محتوى ثابت في النموذج التوضيحي) */
+        hpTheme: 'محور الشهر',
+        hpThemeMessage: 'محور الشهر: التخطيط التجاري وإعداد الموازنة',
+
+        /* تعاميم الصفحة الرئيسية — صندوقان منفصلان */
+        hpCircComms: 'تعاميم الاتصال الداخلي',
+        hpCircCommsOwner: 'العلاقات العامة والاتصال الداخلي',
+        hpCircEr: 'تعاميم علاقات الموظفين',
+        hpCircErOwner: 'الموارد البشرية — علاقات الموظفين',
+        hpCircEmpty: 'لا توجد تعاميم في هذه الفئة حالياً',
+
+        /* عناصر مصغّرة أعلى الصفحة: الصلاة والطقس */
+        wgPrayerOpen: 'عرض مواقيت الصلاة',
+        wgWeatherOpen: 'عرض تفاصيل الطقس',
+        wgNextPrayer: 'الصلاة التالية',
+
+        /* إحصاءات زوار قطر — بيانات توضيحية */
+        vsTitle: 'إحصاءات زوار قطر',
+        vsPeriod: 'منذ بداية العام',
+        vsVisitors: 'إجمالي الزوار',
+        vsMonth: 'زوار هذا الشهر',
+        vsYoY: 'مقارنة بالعام الماضي',
+        vsOccupancy: 'إشغال الفنادق',
+        vsStay: 'متوسط مدة الإقامة',
+        vsNights: 'ليالٍ',
+        vsTrend: 'اتجاه الزوار الشهري',
+        vsMarkets: 'أهم الأسواق المصدّرة',
+        vsOpen: 'عرض لوحة المؤشرات',
+        vsDisclaimer: 'بيانات توضيحية — ليست إحصاءات سياحة رسمية. لم يتم استلام لوحة المؤشرات الفعلية بعد.',
+        vsMarketGcc: 'دول الخليج',
+        vsMarketEurope: 'أوروبا',
+        vsMarketAsia: 'آسيا',
+        vsMarketAmericas: 'الأمريكتان',
+        vsMarketOther: 'أخرى',
         openMenu: 'فتح القائمة',
         closeMenu: 'إغلاق القائمة',
         languageLabel: 'اللغة',
@@ -708,7 +744,7 @@ window.VQ_I18N = {
         hpUpdates: 'Announcements',
         showAll: 'Show All',
         showMore: 'Show More',
-        hpEvents: 'VQ & QC Events',
+        hpEvents: 'VQ & QT Events',
         hpShows: 'Tradeshows & Roadshows',
         hpShowsDesc: 'Visit Qatar tradeshows and roadshows, drawn from published press releases.',
         evOwnerVq: 'VQ',
@@ -719,8 +755,44 @@ window.VQ_I18N = {
         hpViewList: 'List',
         hpViewCalendar: 'Calendar',
         hpDiscounts: 'Discounts',
+        hpDiscountsDesc: 'A repository of employee discounts and partner offers.',
         hpNews: 'Latest News',
         hpHotlines: 'Hotlines',
+
+        /* Theme of the Month ticker (static prototype content) */
+        hpTheme: 'Theme of the Month',
+        hpThemeMessage: 'Theme of the Month: Business Planning & Budget Preparation',
+
+        /* Homepage circulars — two separate boxes */
+        hpCircComms: 'Internal Comms Circulars',
+        hpCircCommsOwner: 'PR & Internal Communications',
+        hpCircEr: 'Employee Relations Circulars',
+        hpCircErOwner: 'HR — Employee Relations',
+        hpCircEmpty: 'No circulars in this category yet',
+
+        /* Compact top widgets: prayer and weather */
+        wgPrayerOpen: 'Show prayer times',
+        wgWeatherOpen: 'Show weather details',
+        wgNextPrayer: 'Next prayer',
+
+        /* Qatar Visitor Statistics — demo data */
+        vsTitle: 'Qatar Visitor Statistics',
+        vsPeriod: 'Year to date',
+        vsVisitors: 'Total visitors',
+        vsMonth: 'Visitors this month',
+        vsYoY: 'vs. last year',
+        vsOccupancy: 'Hotel occupancy',
+        vsStay: 'Average stay',
+        vsNights: 'nights',
+        vsTrend: 'Monthly visitor trend',
+        vsMarkets: 'Top source markets',
+        vsOpen: 'Open dashboard preview',
+        vsDisclaimer: 'Sample / demo data — not official Qatar tourism statistics. The live dashboard has not been provided yet.',
+        vsMarketGcc: 'GCC',
+        vsMarketEurope: 'Europe',
+        vsMarketAsia: 'Asia',
+        vsMarketAmericas: 'Americas',
+        vsMarketOther: 'Other',
         openMenu: 'Open menu',
         closeMenu: 'Close menu',
         languageLabel: 'Language',

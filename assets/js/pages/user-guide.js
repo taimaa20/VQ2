@@ -5,6 +5,8 @@
     const s = { q: '', system: 'all', page: 1 };
     const PAGE_SIZE = 6;
 
+    /* Systems and guides flagged `hidden` in /data stay out of the prototype UI (Tawasol) */
+    const systems = () => D.guideSystems.filter(x => !x.hidden);
     const sysOf = key => D.guideSystems.find(x => x.key === key);
     const KIND = {
         video: { icon: 'fa-circle-play', label: () => t('ugVideo'), variant: 'ruby' },
@@ -15,7 +17,8 @@
     function filtered() {
         const q = s.q.trim().toLowerCase();
         return D.guides
-            .filter(g => s.system === 'all' || g.system === s.system)
+            .filter(g => !g.hidden && !(sysOf(g.system) || {}).hidden)
+            .filter(g => s.system === 'all' || s.system === g.system)
             .filter(g => !q || (g.title.ar + ' ' + g.title.en + ' ' + g.description.ar + ' ' + g.description.en).toLowerCase().includes(q));
     }
 
@@ -79,7 +82,7 @@
                 ui.filterBar([
                     ui.filters(ui.searchField({ id: 'ugQ', value: s.q, placeholder: t('ugSearch') }) + ui.clearButton()),
                     ui.tabs({ name: 'system', active: s.system, label: t('ugAllSystems'), items: [{ value: 'all', label: t('ugAllSystems') }]
-                        .concat(D.guideSystems.map(x => ({ value: x.key, label: tx(x.name), icon: x.icon }))) })
+                        .concat(systems().map(x => ({ value: x.key, label: tx(x.name), icon: x.icon }))) })
                 ]) +
                 `<div id="results"></div>`
             ));

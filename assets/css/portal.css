@@ -139,10 +139,11 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
     display: grid;
     grid-template-areas:
         "left header header"
+        "left utility utility"
         "left content right"
         "left footer footer";
     grid-template-columns: minmax(13.5rem, 16%) minmax(0, 1fr) minmax(16.5rem, 18%);
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto auto 1fr auto;
     min-height: 100vh;
 }
 
@@ -1215,7 +1216,9 @@ button.cal-day.is-selected { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--vq-ambe
 .calendar-map-head h4 { display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.95rem; color: var(--vq-teal); }
 .calendar-map-head h4 i { color: var(--vq-ruby); }
 .calendar-events { grid-column: 1 / -1; }
-.calendar-map-canvas { flex: 1; min-height: 18rem; background: #e7f2f4; direction: ltr; }
+/* z-index:0 keeps Leaflet's internal panes (z-index 400) inside their own stacking context,
+   so the map cannot paint over the sticky header, the top strip or a modal. */
+.calendar-map-canvas { position: relative; z-index: 0; flex: 1; min-height: 18rem; background: #e7f2f4; direction: ltr; }
 .calendar-map-canvas.leaflet-container { font-family: inherit; }
 .calendar-map-canvas img { max-width: none !important; }
 .cal-pin-wrap { background: none !important; border: 0 !important; }
@@ -1727,6 +1730,267 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
 .external-note p { margin-top: 0.3rem; color: var(--muted); font-size: 0.9rem; }
 
 /* ==========================================================================
+   Top strip — Theme of the Month ticker + compact prayer / weather widgets
+   Sits between the header and the page, so it never covers the TopBar controls.
+   ========================================================================== */
+.util-wrap {
+    grid-area: utility;
+    --util-h: 2.9rem;
+    position: sticky;
+    top: var(--header-h);
+    z-index: 55;
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 1px 6px rgba(0, 98, 108, 0.07);
+}
+.util-bar { display: flex; align-items: center; gap: 0.75rem; min-height: var(--util-h); padding: 0.3rem 1.15rem; }
+
+/* Ticker: one static prototype message, moving continuously from right to left */
+.ticker { display: flex; align-items: center; gap: 0.6rem; flex: 1 1 auto; min-width: 0; }
+.ticker-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
+    font-size: 0.74rem;
+    font-weight: 500;
+    color: #fff;
+    background: var(--vq-teal);
+    border-radius: 999px;
+    padding: 0.15rem 0.7rem;
+    white-space: nowrap;
+}
+.ticker-label i { font-size: 0.7rem; color: var(--vq-amber); }
+.ticker-viewport {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 2rem, #000 calc(100% - 2rem), transparent);
+    mask-image: linear-gradient(to right, transparent, #000 2rem, #000 calc(100% - 2rem), transparent);
+}
+.ticker-track { display: flex; width: max-content; animation: ticker-scroll 8s linear infinite; }
+.ticker-item { padding-inline-end: 5rem; font-size: 0.82rem; font-weight: 500; color: var(--vq-teal-dark); white-space: nowrap; }
+.ticker:hover .ticker-track { animation-play-state: paused; }
+
+/* -12.5% = one of the eight identical copies in .ticker-track */
+@keyframes ticker-scroll {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(-12.5%, 0, 0); }
+}
+
+/* Compact widgets */
+.util-widgets { display: flex; align-items: center; gap: 0.4rem; margin-inline-start: auto; flex-shrink: 0; }
+.util-widget { position: relative; }
+.util-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.2rem 0.6rem 0.2rem 0.35rem;
+    padding-inline: 0.35rem 0.6rem;
+    border: 1px solid rgba(0, 98, 108, 0.22);
+    border-radius: 999px;
+    background: var(--vq-offwhite);
+    color: var(--vq-teal-dark);
+    line-height: 1.15;
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.util-chip:hover,
+.util-widget.is-open .util-chip { border-color: var(--vq-teal); background: var(--teal-tint); box-shadow: 0 2px 8px rgba(0, 98, 108, 0.12); }
+.util-chip-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: var(--vq-teal);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+}
+.util-widget[data-widget="weather"] .util-chip-icon { background: var(--vq-amber); }
+.util-chip-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; text-align: start; }
+.util-chip-text small { font-size: 0.6rem; color: var(--muted); }
+.util-chip-text strong { font-size: 0.82rem; font-weight: 500; }
+.util-chip-caret { font-size: 0.6rem; color: var(--muted); transition: transform 0.2s ease; }
+.util-widget.is-open .util-chip-caret { transform: rotate(180deg); }
+
+.util-pop {
+    position: absolute;
+    top: calc(100% + 0.45rem);
+    inset-inline-end: 0;
+    z-index: 80;
+    width: min(20rem, calc(100vw - 1.5rem));
+    max-height: min(70vh, 32rem);
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 0.9rem;
+    box-shadow: 0 16px 34px rgba(0, 71, 79, 0.2);
+    padding: 0.55rem;
+}
+.util-pop .panel-box,
+.util-pop .prayer-card { box-shadow: none; }
+.util-pop .weather-box { padding: 0; }
+.util-pop .prayer-card { border: 0; padding: 0.35rem 0.15rem 0.1rem; background: none; }
+
+/* ==========================================================================
+   Homepage circulars — Internal Comms (left) and Employee Relations (right)
+   ========================================================================== */
+.circulars-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; align-items: start; }
+.circular-box {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--line);
+    border-radius: 0.9rem;
+    background: #fff;
+    overflow: hidden;
+    --box-accent: var(--vq-teal);
+}
+.circular-box.is-er { --box-accent: var(--vq-sec-crimson); }
+.circular-box-head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem 0.85rem;
+    background: color-mix(in srgb, var(--box-accent) 7%, #fff);
+    border-bottom: 2px solid var(--box-accent);
+}
+.circular-box-icon {
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 0.6rem;
+    background: var(--box-accent);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+.circular-box-titles { min-width: 0; flex: 1; }
+.circular-box-titles h3 { font-size: 0.98rem; color: var(--box-accent); line-height: 1.3; }
+.circular-box-titles p { font-size: 0.72rem; color: var(--muted); line-height: 1.4; }
+.circular-box-head .show-more { flex-shrink: 0; }
+/* 2 x 2 card grid inside each box, built from the shared .listing-card used by the
+   Announcements page; only the proportions are tightened for the narrower column. */
+.circular-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; padding: 0.75rem; }
+.circular-cards .listing-card { flex-direction: column; min-height: 0; border-radius: 0.85rem; }
+.circular-cards .card-header { width: 100%; min-width: 0; height: auto; aspect-ratio: 16 / 9; max-height: 11rem; }
+.circular-cards .card-details { padding: 0.7rem 0.75rem 0.8rem; gap: 0.45rem; }
+.circular-cards .card-chips { gap: 0.25rem; margin-bottom: 0.35rem; }
+.circular-cards .card-chips .tag { font-size: 0.62rem; padding: 0.05rem 0.45rem; }
+.circular-cards .card-title {
+    font-size: 0.9rem;
+    line-height: 1.45;
+    margin-bottom: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.circular-cards .listing-card:hover .card-title { color: var(--box-accent); }
+.circular-cards .card-meta { font-size: 0.72rem; gap: 0.2rem 0.6rem; }
+.circular-cards .card-meta .mask-icon { width: 0.85rem; height: 0.85rem; color: var(--vq-ruby); margin-inline-end: 0.3rem; vertical-align: -2px; }
+.circular-empty { padding: 1.4rem 0.85rem; text-align: center; font-size: 0.85rem; color: var(--muted); }
+
+/* Short note under a section heading (Discounts repository) */
+.section-desc { margin: -0.15rem 0 1rem; font-size: 0.875rem; color: var(--text); line-height: 1.65; max-width: 46rem; }
+
+/* ==========================================================================
+   Side panel — compact link tiles (Option 1's "Software & System Links" layout)
+   ========================================================================== */
+.links-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.4rem;
+    max-height: 16rem;
+    overflow-y: auto;
+    padding-inline-end: 0.15rem;
+}
+.link-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    height: 100%;
+    padding: 0.55rem 0.35rem;
+    text-align: center;
+    background: #fff;
+    border: 1px solid var(--line-soft);
+    border-radius: 0.7rem;
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.link-tile:hover { border-color: var(--vq-teal); background: var(--teal-tint); box-shadow: 0 4px 10px rgba(0, 98, 108, 0.1); }
+.link-tile .link-icon { width: 1.85rem; height: 1.85rem; border-radius: 0.55rem; background: var(--teal-tint); color: var(--vq-teal); font-size: 0.8rem; box-shadow: none; }
+.link-tile:hover .link-icon { background: var(--vq-teal); color: #fff; }
+.link-tile .link-label { font-size: 0.72rem; font-weight: 500; line-height: 1.35; color: var(--ink-2); text-decoration: none; }
+.link-tile:hover .link-label { color: var(--vq-teal-dark); }
+
+/* ==========================================================================
+   Qatar Visitor Statistics — prototype card and dashboard preview (demo data)
+   ========================================================================== */
+.vs-box .panel-head { padding-bottom: 0.3rem; }
+.vs-demo {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.62rem;
+    font-weight: 500;
+    color: var(--muted);
+    background: #f1f5f6;
+    border: 1px solid var(--line-soft);
+    border-radius: 999px;
+    padding: 0.08rem 0.5rem;
+    white-space: nowrap;
+}
+.vs-card { display: flex; flex-direction: column; gap: 0.6rem; width: 100%; text-align: start; padding: 0.3rem 0.9rem 0.9rem; }
+.vs-hero { display: flex; flex-direction: column; }
+.vs-hero-value { font-size: 1.85rem; font-weight: 500; color: var(--vq-teal); line-height: 1.05; }
+.vs-hero-label { font-size: 0.72rem; color: var(--muted); }
+.vs-spark { display: flex; align-items: flex-end; gap: 2px; height: 2.6rem; }
+.vs-spark > span { flex: 1 1 0; min-width: 0; background: linear-gradient(180deg, var(--vq-teal-light), rgba(0, 98, 108, 0.22)); border-radius: 2px 2px 0 0; }
+.vs-mini { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.4rem; }
+.vs-mini-item { display: flex; flex-direction: column; gap: 0.1rem; background: #f3f8f9; border: 1px solid #edf3f4; border-radius: 0.6rem; padding: 0.4rem 0.5rem; }
+.vs-mini-item small { font-size: 0.63rem; color: var(--muted); }
+.vs-mini-item b { font-size: 0.95rem; font-weight: 500; color: var(--ink); }
+.vs-up { color: var(--vq-green); }
+.vs-open { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.75rem; font-weight: 500; color: var(--vq-ruby); }
+.vs-card:hover .vs-open { text-decoration: underline; }
+.vs-card:hover .vs-hero-value { color: var(--vq-teal-dark); }
+
+.vs-modal { display: flex; flex-direction: column; gap: 1.1rem; }
+.vs-note {
+    display: flex;
+    gap: 0.45rem;
+    align-items: flex-start;
+    font-size: 0.74rem;
+    line-height: 1.55;
+    color: var(--muted);
+    border-top: 1px solid var(--line-soft);
+    padding-top: 0.75rem;
+}
+.vs-note i { color: var(--vq-amber); margin-top: 0.15rem; flex-shrink: 0; }
+.vs-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.65rem; }
+.vs-kpi { display: flex; flex-direction: column; gap: 0.15rem; background: #f7fbfc; border: 1px solid var(--line-soft); border-radius: 0.75rem; padding: 0.7rem 0.75rem; }
+.vs-kpi-label { font-size: 0.72rem; color: var(--muted); }
+.vs-kpi-value { font-size: 1.5rem; font-weight: 500; color: var(--vq-teal); line-height: 1.15; }
+.vs-kpi-sub { font-size: 0.7rem; color: var(--muted); }
+.vs-panels { display: grid; grid-template-columns: 1.35fr 1fr; gap: 1rem; }
+.vs-panel { border: 1px solid var(--line-soft); border-radius: 0.75rem; padding: 0.85rem 0.9rem 1rem; }
+.vs-panel h4 { font-size: 0.9rem; color: var(--vq-teal-dark); margin-bottom: 0.85rem; }
+.vs-bars { display: flex; align-items: flex-end; gap: 0.3rem; height: 8.5rem; margin-bottom: 1.15rem; }
+.vs-bar { position: relative; flex: 1 1 0; min-width: 0; height: 100%; display: flex; align-items: flex-end; }
+.vs-bar > span { width: 100%; background: linear-gradient(180deg, var(--vq-teal-light), var(--vq-teal)); border-radius: 3px 3px 0 0; }
+.vs-bar small { position: absolute; inset-inline: 0; top: calc(100% + 0.3rem); text-align: center; font-size: 0.6rem; color: var(--muted); }
+.vs-markets { display: flex; flex-direction: column; gap: 0.6rem; }
+.vs-markets li { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr) 2.4rem; align-items: center; gap: 0.5rem; font-size: 0.78rem; }
+.vs-market-name { color: var(--ink-2); }
+.vs-market-track { height: 0.5rem; border-radius: 999px; background: #e8f1f2; overflow: hidden; }
+.vs-market-track > span { display: block; height: 100%; border-radius: 999px; background: var(--vq-teal); }
+.vs-market-val { color: var(--muted); text-align: end; }
+
+/* ==========================================================================
    Responsive
    ========================================================================== */
 @media (max-width: 1360px) {
@@ -1742,7 +2006,14 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
     [dir="ltr"] .link-item { padding: 0.5rem; }
 }
 
+/* Below this the inner 2 x 2 cards would get too narrow, so the two boxes stack
+   and each one keeps its own 2 x 2 grid across the full content width. */
+@media (max-width: 1599px) {
+    .circulars-grid { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 1180px) {
+    .vs-panels { grid-template-columns: 1fr; }
     .link-item .link-text-label { display: none; }
     .link-item { padding: 0.5rem; }
     .user-role { display: none; }
@@ -1754,7 +2025,7 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
 
 @media (max-width: 1024px) {
     .qt-page {
-        grid-template-areas: "header" "content" "right" "footer";
+        grid-template-areas: "header" "utility" "content" "right" "footer";
         grid-template-columns: minmax(0, 1fr);
     }
     :root { --header-h: 3.5rem; }
@@ -1884,6 +2155,8 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
     .nav-icon { width: 1.35rem; font-size: 1rem; }
     .menu-backdrop { display: block; position: fixed; inset: 0; background: rgba(0, 28, 34, 0.48); z-index: 110; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
     .menu-open .menu-backdrop { opacity: 1; pointer-events: auto; }
+    .util-wrap { --util-h: 2.7rem; }
+    .util-bar { padding: 0.25rem 0.75rem; gap: 0.5rem; }
     .sidebar-right { border-inline-start: 0; border-top: 1px solid #d9e6e8; }
     .prayer-times-section { position: static; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; padding: 1.25rem; }
     .prayer-times-section .links-section { grid-column: 1 / -1; }
@@ -1891,6 +2164,7 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
 }
 
 @media (max-width: 860px) {
+    .vs-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .user-info { display: none; }
     .text-size { display: none; }
     .search-field { width: 100%; }
@@ -1969,6 +2243,16 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
 }
 
 @media (max-width: 640px) {
+    .circular-cards { grid-template-columns: 1fr; gap: 0.65rem; padding: 0.65rem; }
+    .util-wrap { --util-h: auto; }
+    .util-bar { flex-wrap: wrap; gap: 0.35rem; padding: 0.3rem 0.65rem; }
+    .util-widgets { order: 1; position: relative; width: 100%; margin-inline-start: 0; justify-content: flex-end; }
+    .ticker { order: 2; flex: 1 1 100%; min-width: 0; }
+    /* Anchor both panels to the widget row, not to the single chip, so the first chip's
+       panel cannot run past the edge of a narrow screen. */
+    .util-widget { position: static; }
+    .util-pop { top: calc(100% + 0.4rem); width: min(19rem, calc(100vw - 1.3rem)); }
+    .vs-markets li { grid-template-columns: 4.6rem minmax(0, 1fr) 2.2rem; }
     .profile { flex-shrink: 0; }
     .prayer-times-section { padding: 0.75rem 0.65rem 1rem; }
     .content { padding: 0.9rem 0.75rem 1.5rem; }
@@ -1998,6 +2282,14 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
    full-width field directly under the bar. Left to right in Arabic:
    profile, language, search, burger, then the logo on the far right. */
 @media (max-width: 480px) {
+    .util-bar { padding-inline: 0.5rem; }
+    .util-chip { gap: 0.3rem; padding-inline: 0.25rem 0.5rem; }
+    .util-chip-icon { width: 1.35rem; height: 1.35rem; font-size: 0.62rem; }
+    .util-chip-text strong { font-size: 0.78rem; }
+    .ticker-label { font-size: 0.68rem; padding: 0.1rem 0.55rem; }
+    .ticker-item { font-size: 0.78rem; padding-inline-end: 3.5rem; }
+    .util-pop { width: calc(100vw - 1rem); }
+    .vs-kpis { grid-template-columns: 1fr; }
     .top-bar {
         position: relative;
         gap: 0.35rem;
@@ -2072,6 +2364,11 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
     [dir="rtl"] .menu-toggle { order: 2; }
     [dir="rtl"] .search-box { order: 3; flex: 0 0 auto; width: auto; }
     [dir="rtl"] .header-tools { order: 4; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ticker-track { animation: none; }
+    .ticker-viewport { overflow-x: auto; }
 }
 
 @keyframes compact-search-in {
