@@ -25,7 +25,7 @@
         title: () => t('stTitle'),
 
         render() {
-            VQ.content(ui.page([{ label: t('navStructure') }],
+            VQ.content(ui.page(ui.hrCrumbs().concat({ label: t('navStructure') }),
                 ui.pageHead({
                     title: t('stTitle'), desc: t('stDesc'),
                     actions: `<button type="button" class="btn btn-primary" data-open-file><i class="fa-solid fa-file-pdf"></i>${t('stOpenFile')}</button>`

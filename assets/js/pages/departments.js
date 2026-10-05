@@ -51,10 +51,17 @@
                 </button>`).join('')}</div>` : '') +
               (files.length ? `<p class="library-label">${t('dpFiles')}</p>${filesTable(files)}` : '');
 
+        /* HR also holds the Courses and VQ Structure pages (moved here from the main menu) */
+        const hrPages = d.key === 'hr' ? `<nav class="dept-pages" aria-label="${esc(t('dpHrPages'))}">
+                <a class="dept-page-link" href="${VQ.href('courses')}"><i class="fa-solid fa-graduation-cap"></i><span>${t('navCourses')}</span>${ui.arrow()}</a>
+                <a class="dept-page-link" href="${VQ.href('structure')}"><i class="fa-solid fa-diagram-project"></i><span>${t('navStructure')}</span>${ui.arrow()}</a>
+            </nav>` : '';
+
         return `<div class="library-intro">
                 <span class="lib-icon"><i class="fa-solid ${d.icon}"></i></span>
                 <div><h3>${esc(tx(d.name))}</h3><p>${esc(tx(d.description))}</p></div>
             </div>
+            ${hrPages}
             <nav class="breadcrumb-bar" aria-label="${t('dpFolders')}">${crumbs}</nav>
             ${body}`;
     }

@@ -213,10 +213,11 @@ body.nav-collapsed .nav-item.is-active {
     font-size: 1.05rem;
     flex-shrink: 0;
 }
-.menu-toggle .fa-xmark,
-.sidebar-collapse-toggle .fa-xmark { display: none; }
-.menu-open .menu-toggle .fa-bars { display: none; }
-.menu-open .menu-toggle .fa-xmark { display: inline-block; }
+.menu-icon-collapse { display: none; }
+.menu-open .menu-toggle .menu-icon-open,
+body:not(.nav-collapsed) .sidebar-collapse-toggle .menu-icon-open { display: none; }
+.menu-open .menu-toggle .menu-icon-collapse,
+body:not(.nav-collapsed) .sidebar-collapse-toggle .menu-icon-collapse { display: inline-block; }
 
 .header-start { display: none; align-items: center; gap: 0.45rem; min-width: 0; flex-shrink: 0; }
 .header-tools { display: flex; align-items: center; gap: 0.6rem; min-width: 0; flex-shrink: 0; }
@@ -541,8 +542,13 @@ body.nav-collapsed .nav-item.is-active {
 .sidebar-brand-image {
     display: block;
     width: auto;
-    max-width: 100%;
+    max-width: calc(100% - 1.5rem);
     height: 4rem;
+    object-fit: contain;
+    background: #fff;
+    border-radius: 0.75rem;
+    padding: 0.4rem 0.7rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 .sidebar-collapse-toggle {
     width: 2.15rem;
@@ -596,6 +602,51 @@ body.nav-collapsed .nav-item.is-active {
 .nav-item.is-active { background: var(--page-bg); color: var(--vq-teal); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12); }
 .nav-item.is-active .nav-icon { color: var(--vq-teal); }
 .nav-label { white-space: nowrap; }
+button.nav-item { width: calc(100% - 0.4rem); text-align: start; }
+
+/* Departments → HR → Courses / VQ Structure */
+.nav-group-row { position: relative; }
+.nav-group-row .nav-item { padding-inline-end: 2.3rem; }
+.nav-caret {
+    position: absolute;
+    top: 50%;
+    inset-inline-end: 0.45rem;
+    transform: translateY(-50%);
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 0.5rem;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.62rem;
+    transition: background 0.2s ease;
+}
+.nav-caret:hover { background: rgba(255, 255, 255, 0.16); }
+.nav-item.is-active + .nav-caret { color: var(--vq-teal); }
+.nav-item.is-active + .nav-caret:hover { background: var(--teal-tint); }
+.nav-caret i { transition: transform 0.2s ease; }
+.nav-group.is-open .nav-caret i { transform: rotate(180deg); }
+.nav-group-body { display: none; }
+.nav-group.is-open .nav-group-body { display: block; }
+.nav-sub { display: flex; flex-direction: column; gap: 0.1rem; }
+.nav-sub-1 { padding: 0.25rem 0.6rem 0.3rem; padding-inline-start: 2.3rem; }
+.nav-sub-2 { margin: 0.1rem 0 0.15rem; margin-inline-start: 0.7rem; padding-inline-start: 0.6rem; border-inline-start: 1px solid rgba(255, 255, 255, 0.28); }
+.nav-sub-item {
+    display: block;
+    padding: 0.3rem 0.65rem;
+    border-radius: 0.6rem;
+    color: rgba(255, 255, 255, 0.86);
+    font-size: 0.82rem;
+    line-height: 1.35;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+.nav-sub-item:hover { background: rgba(255, 255, 255, 0.14); color: #fff; }
+.nav-sub-item.is-parent { color: #fff; font-weight: 500; }
+.nav-sub-item.is-active { background: #fff; color: var(--vq-teal); font-weight: 500; }
+body.nav-collapsed .nav-caret,
+body.nav-collapsed .nav-group.is-open .nav-group-body { display: none; }
+body.nav-collapsed .nav-group-row .nav-item { padding-inline-end: 0.45rem; }
 
 body.nav-collapsed .nav-item::after {
     content: attr(data-label);
@@ -651,7 +702,10 @@ body.nav-collapsed .sidebar-brand {
     padding-bottom: 0.15rem;
 }
 body.nav-collapsed .sidebar-brand-image {
-    height: 2rem;
+    height: 2.2rem;
+    max-width: calc(100% - 0.6rem);
+    padding: 0.2rem 0.3rem;
+    border-radius: 0.55rem;
 }
 body.nav-collapsed .nav-item.is-active {
     border-radius: 1rem;
@@ -659,6 +713,20 @@ body.nav-collapsed .nav-item.is-active {
 }
 
 .menu-backdrop { display: none; }
+
+/* Desktop: the logo sits at the start of the white top bar (as on small screens), so the
+   menu head holds only the collapse control and the first menu item follows straight after.
+   (Below 1025px the drawer keeps its own header.) */
+@media (min-width: 1025px) {
+    .header-start { display: flex; }
+    .header-logo { display: inline-flex; }
+    .header-logo img { height: 3.4rem; max-width: none; }
+    .sidebar-brand { display: none; }
+    .sidebar-header { padding: 0.55rem 0 0.15rem; }
+    .sidebar-collapse-toggle { margin: 0; }
+    .sidebar { padding-top: 0.4rem; top: 0; max-height: 100vh; }
+    body.nav-collapsed .sidebar-header { padding: 0.55rem 0 0.15rem; gap: 0; }
+}
 
 /* ---------- Content area ---------- */
 .content { padding: 1.25rem 1.5rem 2.25rem; }
@@ -1172,6 +1240,18 @@ button.cal-day.is-selected { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--vq-ambe
 .calendar-legend { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.75rem; font-size: 0.75rem; color: var(--muted); }
 .calendar-legend span { display: inline-flex; align-items: center; gap: 0.35rem; }
 .calendar-legend i { width: 0.7rem; height: 0.7rem; border-radius: 0.2rem; display: inline-block; }
+.calendar-nav { display: inline-flex; gap: 0.35rem; }
+/* Official holiday: ruby outline and text; on an event day a ruby dot marks it */
+.cal-day.is-holiday { background: rgba(138, 21, 56, 0.1); color: var(--vq-ruby); font-weight: 500; box-shadow: inset 0 0 0 1px rgba(138, 21, 56, 0.45); }
+.cal-day.is-holiday.is-today { background: rgba(215, 107, 0, 0.12); }
+button.cal-day.has-event.is-holiday::after { content: ""; position: absolute; bottom: 0.25rem; left: 50%; width: 0.35rem; height: 0.35rem; margin-left: -0.175rem; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px var(--vq-ruby); }
+.legend-holiday { background: rgba(138, 21, 56, 0.1); box-shadow: inset 0 0 0 1px rgba(138, 21, 56, 0.6); }
+.calendar-legend .legend-holiday,
+.calendar-holidays .legend-holiday { width: 0.7rem; height: 0.7rem; border-radius: 0.2rem; display: inline-block; flex-shrink: 0; }
+.calendar-holidays { margin-top: 0.7rem; padding-top: 0.6rem; border-top: 1px solid var(--line-soft); }
+.calendar-holidays p { font-size: 0.75rem; font-weight: 500; color: var(--ink-2); margin-bottom: 0.3rem; }
+.calendar-holidays li { display: flex; align-items: center; flex-wrap: wrap; gap: 0.2rem 0.45rem; font-size: 0.78rem; color: var(--vq-ruby); padding: 0.15rem 0; }
+.calendar-holidays small { font-size: 0.72rem; color: var(--muted); }
 .calendar-note { margin-top: 0.6rem; font-size: 0.75rem; color: var(--faint); display: flex; align-items: center; gap: 0.35rem; }
 .day-list-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.4rem; }
 .day-list-head h4 { font-size: 0.95rem; color: var(--ink); }
@@ -1187,10 +1267,15 @@ button.cal-day.is-selected { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--vq-ambe
 
 /* Offers (discounts) on home: 2 × 2 horizontal cards */
 .offers-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
-.offers-grid .listing-card { min-height: 8.75rem; }
-.offers-grid .card-header { width: 9.5rem; min-width: 9.5rem; }
-.offers-grid .card-details { padding: 0.8rem 0.95rem; gap: 0.35rem; }
-.offers-grid .card-title { font-size: 0.95rem; color: var(--vq-teal); }
+.offers-grid .listing-card,
+.offers-slider .listing-card { min-height: 8.75rem; }
+.offers-grid .card-header,
+.offers-slider .card-header { width: 9.5rem; min-width: 9.5rem; }
+.offers-grid .card-details,
+.offers-slider .card-details { padding: 0.8rem 0.95rem; gap: 0.35rem; }
+.offers-grid .card-title,
+.offers-slider .card-title { font-size: 0.95rem; color: var(--vq-teal); }
+.offers-slider .listing-card { height: 100%; }
 
 /* Next event banner (SPFx NewHomePage .nhp-hero with the arch outline) */
 .event-hero { position: relative; display: block; overflow: hidden; border-radius: var(--radius-lg); background: var(--vq-teal); color: #fff; min-height: 15.5rem; margin-bottom: 1.5rem; box-shadow: inset 0 -1.5rem 2rem rgba(0, 75, 83, 0.18); }
@@ -1378,6 +1463,10 @@ button.cal-day.is-selected { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--vq-ambe
 .library-intro .lib-icon { width: 2.8rem; height: 2.8rem; border-radius: 0.8rem; background: var(--teal-tint); color: var(--vq-teal); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
 .library-intro h3 { font-size: 1.1rem; color: var(--vq-teal); }
 .library-intro p { font-size: 0.875rem; color: var(--muted); }
+.dept-pages { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: -0.25rem 0 1rem; }
+.dept-page-link { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.9rem; border: 1px solid var(--line); border-radius: 999px; background: #fff; font-size: 0.85rem; font-weight: 500; color: var(--vq-teal); transition: all 0.2s ease; }
+.dept-page-link i:last-child { font-size: 0.7rem; color: var(--vq-ruby); }
+.dept-page-link:hover { border-color: var(--vq-teal); background: var(--teal-tint); }
 .breadcrumb-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 0.45rem; font-size: 0.9rem; padding: 0.65rem 0.9rem; background: var(--vq-offwhite); border: 1px solid var(--line); border-radius: 0.75rem; margin-bottom: 1rem; }
 .breadcrumb-bar button { color: var(--vq-teal); font-weight: 500; text-decoration: underline; }
 .breadcrumb-bar .crumb-sep { color: var(--faint); }
@@ -1773,6 +1862,27 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
 .ticker-item { padding-inline-end: 5rem; font-size: 0.82rem; font-weight: 500; color: var(--vq-teal-dark); white-space: nowrap; }
 .ticker:hover .ticker-track { animation-play-state: paused; }
 
+/* Current month (name from today's date) under the Theme of the Month ticker */
+.util-stack { display: flex; flex-direction: column; gap: 0.25rem; flex: 1 1 auto; min-width: 0; }
+.month-focus { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+.month-focus-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
+    font-size: 0.74rem;
+    font-weight: 500;
+    color: var(--vq-ruby);
+    background: rgba(138, 21, 56, 0.08);
+    border: 1px solid rgba(138, 21, 56, 0.22);
+    border-radius: 999px;
+    padding: 0.1rem 0.7rem;
+    white-space: nowrap;
+}
+.month-focus-label i { font-size: 0.7rem; }
+.month-focus-items { display: flex; flex-wrap: wrap; align-items: center; gap: 0.15rem 0; min-width: 0; font-size: 0.8rem; color: var(--ink-2); line-height: 1.45; }
+.month-focus-items li + li::before { content: "\2022"; margin-inline: 0.55rem; color: var(--faint); }
+
 /* -12.5% = one of the eight identical copies in .ticker-track */
 @keyframes ticker-scroll {
     from { transform: translate3d(0, 0, 0); }
@@ -1873,15 +1983,16 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
 .circular-box-titles h3 { font-size: 0.98rem; color: var(--box-accent); line-height: 1.3; }
 .circular-box-titles p { font-size: 0.72rem; color: var(--muted); line-height: 1.4; }
 .circular-box-head .show-more { flex-shrink: 0; }
-/* 2 x 2 card grid inside each box, built from the shared .listing-card used by the
-   Announcements page; only the proportions are tightened for the narrower column. */
-.circular-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; padding: 0.75rem; }
-.circular-cards .listing-card { flex-direction: column; min-height: 0; border-radius: 0.85rem; }
-.circular-cards .card-header { width: 100%; min-width: 0; height: auto; aspect-ratio: 16 / 9; max-height: 11rem; }
-.circular-cards .card-details { padding: 0.7rem 0.75rem 0.8rem; gap: 0.45rem; }
-.circular-cards .card-chips { gap: 0.25rem; margin-bottom: 0.35rem; }
-.circular-cards .card-chips .tag { font-size: 0.62rem; padding: 0.05rem 0.45rem; }
-.circular-cards .card-title {
+/* One featured circular (the shared .listing-card used by the Announcements page) with the
+   other recent circulars listed beside it as plain links. */
+.circular-body { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 0.85rem; padding: 0.75rem; align-items: start; }
+.circular-body.is-single { grid-template-columns: minmax(0, 1fr); }
+.circular-feature .listing-card { flex-direction: column; min-height: 0; border-radius: 0.85rem; }
+.circular-feature .card-header { width: 100%; min-width: 0; height: auto; aspect-ratio: 16 / 9; max-height: 11rem; }
+.circular-feature .card-details { padding: 0.7rem 0.75rem 0.8rem; gap: 0.45rem; }
+.circular-feature .card-chips { gap: 0.25rem; margin-bottom: 0.35rem; }
+.circular-feature .card-chips .tag { font-size: 0.62rem; padding: 0.05rem 0.45rem; }
+.circular-feature .card-title {
     font-size: 0.9rem;
     line-height: 1.45;
     margin-bottom: 0;
@@ -1890,9 +2001,19 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
-.circular-cards .listing-card:hover .card-title { color: var(--box-accent); }
-.circular-cards .card-meta { font-size: 0.72rem; gap: 0.2rem 0.6rem; }
-.circular-cards .card-meta .mask-icon { width: 0.85rem; height: 0.85rem; color: var(--vq-ruby); margin-inline-end: 0.3rem; vertical-align: -2px; }
+.circular-feature .card-description { font-size: 0.78rem; line-height: 1.6; -webkit-line-clamp: 2; }
+.circular-feature .listing-card:hover .card-title { color: var(--box-accent); }
+.circular-feature .card-meta { font-size: 0.72rem; gap: 0.2rem 0.6rem; }
+.circular-feature .card-meta .mask-icon { width: 0.85rem; height: 0.85rem; color: var(--vq-ruby); margin-inline-end: 0.3rem; vertical-align: -2px; }
+.circular-links { min-width: 0; }
+.circular-links-title { font-size: 0.72rem; font-weight: 500; color: var(--muted); padding-bottom: 0.35rem; border-bottom: 1px solid var(--line-soft); }
+.circular-links ul { display: flex; flex-direction: column; }
+.circular-links li + li { border-top: 1px solid var(--line-soft); }
+.circular-link { display: block; padding: 0.55rem 0.15rem; padding-inline-start: 0.7rem; position: relative; }
+.circular-link::before { content: ""; position: absolute; inset-inline-start: 0; top: 0.95rem; width: 0.3rem; height: 0.3rem; border-radius: 50%; background: var(--box-accent); }
+.circular-link-title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.82rem; font-weight: 500; line-height: 1.45; color: var(--ink-2); transition: color 0.2s ease; }
+.circular-link:hover .circular-link-title { color: var(--box-accent); text-decoration: underline; text-underline-offset: 2px; }
+.circular-link-date { display: block; margin-top: 0.15rem; font-size: 0.7rem; color: var(--muted); }
 .circular-empty { padding: 1.4rem 0.85rem; text-align: center; font-size: 0.85rem; color: var(--muted); }
 
 /* Short note under a section heading (Discounts repository) */
@@ -1927,6 +2048,20 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
 .link-tile:hover .link-icon { background: var(--vq-teal); color: #fff; }
 .link-tile .link-label { font-size: 0.72rem; font-weight: 500; line-height: 1.35; color: var(--ink-2); text-decoration: none; }
 .link-tile:hover .link-label { color: var(--vq-teal-dark); }
+
+/* Links menu item: the same tiles in a popup, without the side-panel height limit */
+.links-grid-modal { max-height: none; overflow: visible; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; }
+@media (max-width: 480px) { .links-grid-modal { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Team Spotlight (side panel, demo content) — same panel-box language as the cards above it */
+.ts-box .panel-head { padding-bottom: 0.3rem; }
+.ts-card { display: flex; flex-direction: column; gap: 0.4rem; }
+.ts-image { display: block; position: relative; aspect-ratio: 16 / 9; border-radius: 0.7rem; overflow: hidden; background: var(--panel-bg); }
+.ts-image img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+.ts-card:hover .ts-image img { transform: scale(1.04); }
+.ts-team { font-size: 0.88rem; font-weight: 500; color: var(--vq-teal); line-height: 1.4; margin-top: 0.15rem; }
+.ts-text { font-size: 0.78rem; color: var(--text); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ts-card:hover .vs-open { text-decoration: underline; }
 
 /* ==========================================================================
    Qatar Visitor Statistics — prototype card and dashboard preview (demo data)
@@ -2006,9 +2141,13 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
     [dir="ltr"] .link-item { padding: 0.5rem; }
 }
 
-/* Below this the inner 2 x 2 cards would get too narrow, so the two boxes stack
-   and each one keeps its own 2 x 2 grid across the full content width. */
-@media (max-width: 1599px) {
+/* Circulars keep the two columns (Internal Comms | Employee Relations). Where a column is too
+   narrow for the featured card and its links side by side, the links move under the card;
+   on small screens the two boxes stack. */
+@media (min-width: 1025px) and (max-width: 1279px) {
+    .circular-body { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 860px) {
     .circulars-grid { grid-template-columns: 1fr; }
 }
 
@@ -2129,8 +2268,8 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
     .sidebar-title { display: block; }
     .sidebar-brand { display: none; }
     .sidebar-collapse-toggle { margin: 0; flex-shrink: 0; }
-    .sidebar-collapse-toggle .fa-bars { display: none; }
-    .sidebar-collapse-toggle .fa-xmark { display: inline-block; font-size: 1.05rem; }
+    .sidebar-collapse-toggle .menu-icon-open { display: none; }
+    .sidebar-collapse-toggle .menu-icon-collapse { display: inline-block; font-size: 1rem; }
     .sidebar {
         position: static;
         flex: 1;
@@ -2153,10 +2292,19 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
         border-inline-start: 3px solid var(--vq-amber);
     }
     .nav-icon { width: 1.35rem; font-size: 1rem; }
+    button.nav-item { width: 100%; }
+    .nav-group-row .nav-item { padding-inline-end: 2.6rem; }
+    .nav-caret { width: 2rem; height: 2rem; font-size: 0.7rem; }
+    .nav-sub-1 { padding-inline-start: 2.55rem; }
+    .nav-sub-item { padding: 0.45rem 0.7rem; font-size: 0.88rem; }
     .menu-backdrop { display: block; position: fixed; inset: 0; background: rgba(0, 28, 34, 0.48); z-index: 110; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
     .menu-open .menu-backdrop { opacity: 1; pointer-events: auto; }
     .util-wrap { --util-h: 2.7rem; }
     .util-bar { padding: 0.25rem 0.75rem; gap: 0.5rem; }
+    /* Month reminders: one per line once they no longer fit on a single row */
+    .month-focus { align-items: flex-start; }
+    .month-focus-items li { width: 100%; }
+    .month-focus-items li + li::before { content: none; }
     .sidebar-right { border-inline-start: 0; border-top: 1px solid #d9e6e8; }
     .prayer-times-section { position: static; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; padding: 1.25rem; }
     .prayer-times-section .links-section { grid-column: 1 / -1; }
@@ -2243,11 +2391,14 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
 }
 
 @media (max-width: 640px) {
-    .circular-cards { grid-template-columns: 1fr; gap: 0.65rem; padding: 0.65rem; }
+    .circular-body { grid-template-columns: 1fr; gap: 0.65rem; padding: 0.65rem; }
     .util-wrap { --util-h: auto; }
     .util-bar { flex-wrap: wrap; gap: 0.35rem; padding: 0.3rem 0.65rem; }
     .util-widgets { order: 1; position: relative; width: 100%; margin-inline-start: 0; justify-content: flex-end; }
     .ticker { order: 2; flex: 1 1 100%; min-width: 0; }
+    .util-stack { order: 2; flex: 1 1 100%; gap: 0.35rem; }
+    .util-stack .ticker { order: 0; }
+    .month-focus-items { font-size: 0.76rem; }
     /* Anchor both panels to the widget row, not to the single chip, so the first chip's
        panel cannot run past the edge of a narrow screen. */
     .util-widget { position: static; }
@@ -2260,8 +2411,10 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
     .details-title { font-size: 1.35rem; }
     .listing-card { flex-direction: column; }
     .card-header { width: 100%; min-width: 0; height: 11rem; }
-    .offers-grid .listing-card { flex-direction: row; min-height: 8.25rem; }
-    .offers-grid .card-header { width: 7.25rem; min-width: 7.25rem; height: auto; }
+    .offers-grid .listing-card,
+    .offers-slider .listing-card { flex-direction: row; min-height: 8.25rem; }
+    .offers-grid .card-header,
+    .offers-slider .card-header { width: 7.25rem; min-width: 7.25rem; height: auto; }
     .listing-grid, .listing-grid.cols-2 { grid-template-columns: 1fr; }
     .filters > * { flex: 1 1 100%; }
     .filter-input, .filter-select { width: 100%; }

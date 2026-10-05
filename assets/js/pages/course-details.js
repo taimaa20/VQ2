@@ -13,7 +13,7 @@
                 ? `<div style="margin-bottom:1.4rem">${ui.videoPlayer({ poster: c.image, title: tx(c.title), length: c.videoLength })}</div>`
                 : `<div class="details-img">${VQ.img(c.image, '', 1400, tx(c.title))}</div>`;
 
-            VQ.content(ui.page([{ label: t('navCourses'), href: VQ.href('courses') }, { label: tx(c.title) }],
+            VQ.content(ui.page(ui.hrCrumbs().concat({ label: t('navCourses'), href: VQ.href('courses') }, { label: tx(c.title) }),
                 ui.detailsHead({
                     chips: ui.tag(tx(type.label), '', type.icon) + (c.video ? ui.tag(t('crVideo'), 'ruby', 'fa-circle-play') : ''),
                     title: esc(tx(c.title)),

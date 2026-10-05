@@ -282,3 +282,16 @@ VQData.events = [
         ]
     }
 ];
+
+/* Official holidays for the homepage calendar — PROTOTYPE DEMO DATES.
+   National Day and National Sport Day follow their fixed rules; Eid dates are estimates
+   (they depend on the moon sighting) and the official holiday period is announced each year. */
+VQData.holidays = [
+    { start: '2026-02-10', end: '2026-02-10', title: { ar: 'اليوم الرياضي للدولة', en: 'National Sport Day' } },
+    { start: '2026-03-20', end: '2026-03-22', title: { ar: 'عيد الفطر', en: 'Eid al-Fitr' } },
+    { start: '2026-05-26', end: '2026-05-29', title: { ar: 'عيد الأضحى', en: 'Eid al-Adha' } },
+    { start: '2026-12-18', end: '2026-12-18', title: { ar: 'اليوم الوطني لدولة قطر', en: 'Qatar National Day' } },
+    { start: '2027-02-09', end: '2027-02-09', title: { ar: 'اليوم الرياضي للدولة', en: 'National Sport Day' } },
+    { start: '2027-03-10', end: '2027-03-12', title: { ar: 'عيد الفطر', en: 'Eid al-Fitr' } },
+    { start: '2027-05-16', end: '2027-05-19', title: { ar: 'عيد الأضحى', en: 'Eid al-Adha' } }
+];

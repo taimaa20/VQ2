@@ -32,6 +32,12 @@
         </div>`;
     }
 
+    /* Departments → HR trail for the pages that sit under HR in the menu (Courses, VQ Structure) */
+    const hrCrumbs = () => [
+        { label: t('navDepts'), href: VQ.href('departments') },
+        { label: t('navDeptHr'), href: VQ.href('departments', { dept: 'hr' }) }
+    ];
+
     /* Breadcrumb + the single white surface */
     const page = (crumbs, body) => breadcrumb(crumbs) + `<div class="page-surface">${body}</div>`;
 
@@ -245,7 +251,7 @@
 
     function docLetterhead(title, subtitle) {
         return `<div class="doc-letterhead">
-            <img src="${VQ.ROOT}/assets/img/vq-logo.svg" alt="Visit Qatar">
+            <img src="${VQ.ROOT}/assets/img/vq-logo-updated.png" alt="Visit Qatar">
             <p><small>${subtitle || ''}</small>${title}</p>
         </div>`;
     }
@@ -303,19 +309,23 @@
         return VQ.isoDate(d);
     }
 
-    /* Month cells: every day in an event’s start–end range uses one teal highlight */
-    function calendarCells({ year, month, events, selected }) {
+    /* Month cells: every day in an event’s start–end range uses one teal highlight.
+       Optional official holidays get their own ruby marking (and a marker dot on event days). */
+    function calendarCells({ year, month, events, selected, holidays }) {
         const first = new Date(year, month - 1, 1);
         const days = new Date(year, month, 0).getDate();
         const todayIso = VQ.isoDate(VQ.today());
         const on = iso => events.filter(e => e.start <= iso && e.end >= iso);
+        const holidayOn = iso => (holidays || []).filter(h => h.start <= iso && h.end >= iso);
         let cells = '<span></span>'.repeat(first.getDay());
 
         for (let d = 1; d <= days; d++) {
             const iso = VQ.isoDate(new Date(year, month - 1, d));
             const list = on(iso);
+            const off = holidayOn(iso);
+            const offTitle = off.map(h => `${t('evCalHoliday')}: ${tx(h.title)}`);
             if (!list.length) {
-                cells += `<span class="cal-day${iso === todayIso ? ' is-today' : ''}">${d}</span>`;
+                cells += `<span class="cal-day${iso === todayIso ? ' is-today' : ''}${off.length ? ' is-holiday' : ''}"${off.length ? ` title="${esc(offTitle.join(' · '))}"` : ''}>${d}</span>`;
                 continue;
             }
             const dow = new Date(year, month - 1, d).getDay();
@@ -327,9 +337,10 @@
                 iso === todayIso ? 'is-today' : '',
                 joinPrev && joinNext ? 'is-span-mid' : '',
                 !joinPrev && joinNext ? 'is-span-start' : '',
-                joinPrev && !joinNext ? 'is-span-end' : ''
+                joinPrev && !joinNext ? 'is-span-end' : '',
+                off.length ? 'is-holiday' : ''
             ].filter(Boolean).join(' ');
-            cells += `<button type="button" class="${cls}" data-cal-day="${iso}" title="${esc(list.map(e => tx(e.title)).join(' · '))}">${d}</button>`;
+            cells += `<button type="button" class="${cls}" data-cal-day="${iso}" title="${esc(offTitle.concat(list.map(e => tx(e.title))).join(' · '))}">${d}</button>`;
         }
         return cells;
     }
@@ -466,7 +477,7 @@
 
     window.VQ.ui = {
         arrow, chevronNext, chevronPrev,
-        breadcrumb, page, pageHead, sectionHead, section, subHead,
+        breadcrumb, hrCrumbs, page, pageHead, sectionHead, section, subHead,
         filterBar, filters, searchField, selectField, dateField, clearButton, tabs, underlineTabs, viewSwitch,
         resultsCount, emptyState, pagination, paginate,
         tag, statusTag, sampleBadge, cardDate, typeOfAnnouncement, typeTag, listingCard, percentBadge,

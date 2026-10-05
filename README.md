@@ -47,9 +47,9 @@ teal menu; page content; side panel; footer under content and panel.
 | Area | SPFx component | Content (Option 1) |
 |---|---|---|
 | Header | `TopBar` | Logo, Photo Gallery, Video Gallery, search with type filters, text size (T−/T+), language, user photo/name/title/department, sign-out icon |
-| Menu | `RightSidebar` | Teal gradient, amber top line, white active tab. **Expanded by default on desktop**; the hamburger collapses it to icons. Home, Departments, Announcements, Discounts, Certificates, Awards, Events, News, Survey, Policies, Hotlines, Photo Gallery, Video Gallery, Courses, User Guide, VQ Structure, Employee Directory |
-| Top strip | — | Under the header on every page: Theme of the Month ticker (home only, static message, right-to-left) and two compact widgets — next prayer + time, and the current temperature. Each opens the existing prayer / weather card in a small panel. |
-| Side panel | `RightPanel` | Vision & mission (SPFx vision carousel), Qatar Visitor Statistics (demo card + dashboard-preview popup), programs & system links (compact icon tiles), hotlines |
+| Menu | `RightSidebar` | Teal gradient, amber top line, white active tab. **Expanded by default on desktop**; an arrow (left in English, right in Arabic) collapses it and a hamburger reopens it. Home, Departments (→ HR → Courses, VQ Structure), Announcements, Discounts, Certificates, Awards, Events, News, Survey, Policies, Hotlines, Photo Gallery, Video Gallery, User Guide, Employee Directory, Links (opens the side-panel link tiles in a popup) |
+| Top strip | — | Under the header on every page: Theme of the Month ticker (home only, static message, right-to-left) with the current month under it (name from today's date, demo reminders in `data/month-focus.js`), and two compact widgets — next prayer + time, and the current temperature. Each opens the existing prayer / weather card in a small panel. |
+| Side panel | `RightPanel` | Vision & mission (SPFx vision carousel), Qatar Visitor Statistics (demo card + dashboard-preview popup), Team Spotlight (demo card), links (compact icon tiles), hotlines |
 | Footer | `FooterBar` | Social links, copyright, certificate logos |
 
 Content rule: each page has one breadcrumb pill, then **one white surface**. Sections inside it are separated
@@ -59,7 +59,7 @@ by a ruby-underlined heading and a divider, not by separate cards.
 
 | Page | Option 1 content kept | Built from SPFx |
 |---|---|---|
-| Home | Internal Comms Circulars (4) + Employee Relations Circulars (4) → VQ Calendar → VQ & QT Events → Tradeshows & Roadshows → Latest News (6) → Discounts repository (4) | `HomePage`: `offers-header-of` headings with ruby "show more", two circular boxes split by publishing team, event listing-card carousel (2 per view), offer cards, news-card carousel |
+| Home | Internal Comms Circulars + Employee Relations Circulars (one featured card + up to 4 links each) → VQ Calendar (event day · today · official holiday, month arrows) → VQ & QT Events → Tradeshows & Roadshows → Latest News (6) → Discounts (slider) | `HomePage`: `offers-header-of` headings with ruby "Show All", two circular boxes split by publishing team, event listing-card carousel (2 per view), news-card carousel, offer-card carousel |
 | Announcements · details | Search, type filter, 6 per page · type, number, dates, body, attachment preview, related link | `AdsPage` listing rows · `DetailsPage` (title, ruby date, image, facts, inline document, back pill) |
 | Events · details | Search, category, date range, list / month calendar, next event, 4 per page · dates, location, facts, album link | `AdsPage` + `NewHomePage` arch banner for the next event · `DetailsPage` with (From)–(To) dates |
 | Discounts · details | Search, category, percentage, partner, expiry, 6 per page · terms, time left, offer document | `AdsPage` discount category tabs and card grid · `DetailsPage` |
@@ -70,12 +70,12 @@ by a ruby-underlined heading and a divider, not by separate cards.
 | Hotlines | Search, two tabs, table, copy / call | `HotlinesPage` tabs + bordered table |
 | Departments | Department selector, search, folders, files (view only) | `SharedFolder` / `DocumentLibrary` folder rows, breadcrumb bar, files table, with `EmployeesPhonebook` tabs as the selector |
 | Employee Directory | Search, department, photo, name, ID, position, department, profile | `EmployeesPhonebook` search, department tabs, contact cards |
-| Courses · details | Search, type, start date, duration, video, 6 per page · overview, objectives, format, provider | No SPFx page. Built from `AdsPage` rows and `DetailsPage` |
+| Courses · details | Search, type, start date, duration, video, 6 per page · overview, objectives, format, provider | No SPFx page. Built from `AdsPage` rows and `DetailsPage`. Reached from Departments → HR |
 | User Guide | Search, system filter, videos / illustrated steps / links | No SPFx page. Built from `AdsPage` tabs and card grid, popup |
 | Survey | Quick polls with results, in-depth survey form | No SPFx page. Built from `HotlinesPage` tabs, category-tab options, popup form |
 | Photo Gallery · album | Search, albums, full-size viewer | TopBar gallery page, `AdsPage` card grid · `DetailsPage` |
 | Video Gallery | Now playing, search, category, grid | TopBar gallery page, `DetailsPage` media frame, `AdsPage` card grid |
-| Structure & Guide | Chart, structure file | `DetailsPage` vocabulary (BRD 6.1.10; reached from the **VQ Structure** menu item) |
+| Structure & Guide | Chart, structure file | `DetailsPage` vocabulary (BRD 6.1.10; reached from Departments → HR → **VQ Structure**) |
 | Discussion Board | Anonymous / alias posting, replies, likes, poll | Popup form rows, category tabs (not a menu item) |
 | Search | Query, type filters, results | `SearchResultsPage` |
 

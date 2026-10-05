@@ -20,7 +20,7 @@
             image: ty.image,
             date: a.start,
             overlay: `<span class="type-strip" style="background:${ty.color}"></span>`,
-            chips: ui.typeTag(ty) + ui.tag(`<span class="ltr">${a.number}</span>`, 'outline'),
+            chips: ui.tag(`<span class="ltr">${a.number}</span>`, 'outline'),
             title: esc(tx(a.title)),
             desc: esc(tx(a.summary)),
             meta: `<span><i class="fa-regular fa-building"></i>${esc(tx(a.issuer))}</span>`

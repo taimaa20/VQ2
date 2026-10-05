@@ -82,6 +82,9 @@ window.VQ_I18N = {
         navEmployees: 'دليل الموظفين',
         navDiscussion: 'منتدى الأفكار والنقاش',
         navStructure: 'الهيكل التنظيمي',
+        navDeptHr: 'الموارد البشرية',
+        navLinks: 'الروابط',
+        navSubmenu: 'عرض القائمة الفرعية',
         navSearch: 'نتائج البحث',
 
         /* Common */
@@ -151,6 +154,8 @@ window.VQ_I18N = {
         evCalEmpty: 'لا توجد فعاليات في هذا الشهر',
         evCalToday: 'اليوم',
         evCalEventDay: 'يوم فيه فعالية',
+        evCalHoliday: 'عطلة رسمية',
+        evCalHolidays: 'العطل الرسمية هذا الشهر',
         prevMonth: 'الشهر السابق',
         nextMonth: 'الشهر التالي',
 
@@ -345,6 +350,7 @@ window.VQ_I18N = {
         /* شريط محور الشهر (محتوى ثابت في النموذج التوضيحي) */
         hpTheme: 'محور الشهر',
         hpThemeMessage: 'محور الشهر: التخطيط التجاري وإعداد الموازنة',
+        hpMonthFocus: 'أنشطة الشهر',
 
         /* تعاميم الصفحة الرئيسية — صندوقان منفصلان */
         hpCircComms: 'تعاميم الاتصال الداخلي',
@@ -352,6 +358,7 @@ window.VQ_I18N = {
         hpCircEr: 'تعاميم علاقات الموظفين',
         hpCircErOwner: 'الموارد البشرية — علاقات الموظفين',
         hpCircEmpty: 'لا توجد تعاميم في هذه الفئة حالياً',
+        hpCircMore: 'تعاميم أخرى',
 
         /* عناصر مصغّرة أعلى الصفحة: الصلاة والطقس */
         wgPrayerOpen: 'عرض مواقيت الصلاة',
@@ -378,6 +385,10 @@ window.VQ_I18N = {
         vsMarketOther: 'أخرى',
         openMenu: 'فتح القائمة',
         closeMenu: 'إغلاق القائمة',
+        collapseMenu: 'طي القائمة',
+        tsTitle: 'تسليط الضوء على الفريق',
+        tsCta: 'التعرف على الفريق',
+        dpHrPages: 'صفحات الموارد البشرية',
         languageLabel: 'اللغة',
         listView: 'قائمة',
 
@@ -499,6 +510,9 @@ window.VQ_I18N = {
         navEmployees: 'Employee Directory',
         navDiscussion: 'Discussion Board',
         navStructure: 'VQ Structure',
+        navDeptHr: 'HR',
+        navLinks: 'Links',
+        navSubmenu: 'Show submenu',
         navSearch: 'Search results',
 
         /* Common */
@@ -568,6 +582,8 @@ window.VQ_I18N = {
         evCalEmpty: 'No events this month',
         evCalToday: 'Today',
         evCalEventDay: 'Event day',
+        evCalHoliday: 'Official holiday',
+        evCalHolidays: 'Official holidays this month',
         prevMonth: 'Previous month',
         nextMonth: 'Next month',
 
@@ -743,7 +759,7 @@ window.VQ_I18N = {
         /* Option 2 — homepage section labels (same wording as option1.html) and shell helpers */
         hpUpdates: 'Announcements',
         showAll: 'Show All',
-        showMore: 'Show More',
+        showMore: 'Show All',
         hpEvents: 'VQ & QT Events',
         hpShows: 'Tradeshows & Roadshows',
         hpShowsDesc: 'Visit Qatar tradeshows and roadshows, drawn from published press releases.',
@@ -762,6 +778,7 @@ window.VQ_I18N = {
         /* Theme of the Month ticker (static prototype content) */
         hpTheme: 'Theme of the Month',
         hpThemeMessage: 'Theme of the Month: Business Planning & Budget Preparation',
+        hpMonthFocus: 'This month',
 
         /* Homepage circulars — two separate boxes */
         hpCircComms: 'Internal Comms Circulars',
@@ -769,6 +786,7 @@ window.VQ_I18N = {
         hpCircEr: 'Employee Relations Circulars',
         hpCircErOwner: 'HR — Employee Relations',
         hpCircEmpty: 'No circulars in this category yet',
+        hpCircMore: 'More circulars',
 
         /* Compact top widgets: prayer and weather */
         wgPrayerOpen: 'Show prayer times',
@@ -795,6 +813,10 @@ window.VQ_I18N = {
         vsMarketOther: 'Other',
         openMenu: 'Open menu',
         closeMenu: 'Close menu',
+        collapseMenu: 'Collapse menu',
+        tsTitle: 'Team Spotlight',
+        tsCta: 'Meet the team',
+        dpHrPages: 'HR pages',
         languageLabel: 'Language',
         listView: 'List',
 

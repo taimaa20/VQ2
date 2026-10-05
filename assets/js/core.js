@@ -6,7 +6,7 @@
      .header        TopBar       (logo · galleries · search · text size · language · user · sign-out)
      .sidebar-left  RightSidebar (teal menu with the white active tab)
      .content       page canvas  (one web part per page, rendered by assets/js/pages/*.js)
-     .sidebar-right RightPanel   (vision & mission · links · weather · prayer times · hotlines)
+     .sidebar-right RightPanel   (vision & mission · visitor statistics · team spotlight · links · hotlines)
      .footer        FooterBar    (social links · copyright · certificate logos)
    No backend: everything reads from the /data files.
    ========================================================================== */
@@ -173,7 +173,12 @@
 
     const NAV_MAIN = [
         { key: 'navHome', icon: 'fa-solid fa-table-cells-large', page: 'home' },
-        { key: 'navDepts', icon: 'fa-solid fa-sitemap', page: 'departments' },
+        { key: 'navDepts', icon: 'fa-solid fa-sitemap', page: 'departments', children: [
+            { key: 'navDeptHr', page: 'departments', params: { dept: 'hr' }, children: [
+                { key: 'navCourses', page: 'courses', also: ['course-details'] },
+                { key: 'navStructure', page: 'structure' }
+            ] }
+        ] },
         { key: 'navAnnouncements', icon: 'fa-solid fa-bullhorn', page: 'announcements', also: ['announcement-details'] },
         { key: 'navDiscounts', icon: 'fa-solid fa-tags', page: 'discounts', also: ['discount-details'] },
         { key: 'navCerts', icon: 'fa-solid fa-certificate', page: 'certificates' },
@@ -185,18 +190,29 @@
         { key: 'navHotlines', icon: 'fa-solid fa-headset', page: 'hotlines' },
         { key: 'navPhotos', icon: 'fa-solid fa-images', page: 'photo-gallery', also: ['album'] },
         { key: 'navVideos', icon: 'fa-solid fa-circle-play', page: 'video-library' },
-        { key: 'navCourses', icon: 'fa-solid fa-graduation-cap', page: 'courses', also: ['course-details'] },
         { key: 'navUserGuide', icon: 'fa-solid fa-book-open', page: 'user-guide' },
-        { key: 'navStructure', icon: 'fa-solid fa-diagram-project', page: 'structure' },
-        { key: 'navEmployees', icon: 'fa-regular fa-address-book', page: 'employees' }
+        { key: 'navEmployees', icon: 'fa-regular fa-address-book', page: 'employees' },
+        { key: 'navLinks', icon: 'fa-solid fa-link', action: 'links' }
     ];
-    /* Visit Qatar Structure & Guide (BRD 6.1.10) was reachable from the Option 1 side panel.
-       The side panel now holds vision, visitor statistics, links and hotlines, so the existing
-       structure page is reached from the menu instead. Discussion Board stays off the menu. */
+    /* Courses and VQ Structure (BRD 6.1.10) sit under Departments → HR, not in the main list.
+       Links opens the same link tiles as the side-panel Links card. Discussion Board stays off the menu. */
 
-    const isCurrent = n => n.page === PAGE || (n.also || []).indexOf(PAGE) !== -1;
+    /* Every menu entry, including the Departments → HR sub-items (search index, active state) */
+    const flatNav = list => list.reduce((all, n) => all.concat(n, n.children ? flatNav(n.children) : []), []);
+
+    const matchesParams = n => !n.params || Object.keys(n.params).every(k => param(k) === n.params[k]);
+    const isSelf = n => !!n.page && (n.page === PAGE || (n.also || []).indexOf(PAGE) !== -1) && matchesParams(n);
+    /* A parent stays highlighted while one of its sub-pages is open */
+    const isCurrent = n => isSelf(n) || (n.children || []).some(isCurrent);
 
     /* ---------- Header (TopBar) ---------- */
+
+    /* Updated Visit Qatar logo (supplied by the client) */
+    const LOGO = ROOT + '/assets/img/vq-logo-updated.png';
+
+    /* Closed menu = burger. Open menu = arrow toward the menu's own edge (left in English,
+       right in Arabic): fa-arrow-right is mirrored by .dir-flip in LTR. */
+    const MENU_TOGGLE_ICONS = '<i class="fa-solid fa-bars menu-icon-open" aria-hidden="true"></i><i class="fa-solid fa-arrow-right dir-flip menu-icon-collapse" aria-hidden="true"></i>';
 
     const USER_PHOTO = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80';
 
@@ -216,11 +232,10 @@
         return `<div class="top-bar">
             <div class="header-start">
                 <a href="${href('home')}" class="header-logo" title="${t('logoHome')}" aria-label="${t('logoHome')}">
-                    <img src="${ROOT}/assets/img/vq-logo.svg" alt="Visit Qatar">
+                    <img src="${LOGO}" alt="Visit Qatar">
                 </a>
                 <button type="button" class="menu-toggle" id="menuToggle" aria-controls="siteMenu" aria-expanded="false" aria-label="${t('openMenu')}">
-                    <i class="fa-solid fa-bars" aria-hidden="true"></i>
-                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                    ${MENU_TOGGLE_ICONS}
                 </button>
             </div>
 
@@ -288,21 +303,48 @@
         return `<div class="sidebar-shell">
             <div class="sidebar-header">
                 <p class="sidebar-title">${t('navMenu')}</p>
-                <button type="button" class="sidebar-collapse-toggle" id="sidebarCollapseToggle" aria-label="${t('openMenu')}" aria-expanded="true">
-                    <i class="fa-solid fa-bars" aria-hidden="true"></i>
-                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                <button type="button" class="sidebar-collapse-toggle" id="sidebarCollapseToggle" aria-label="${t('collapseMenu')}" aria-expanded="true">
+                    ${MENU_TOGGLE_ICONS}
                 </button>
                 <a href="${href('home')}" class="sidebar-brand" title="${t('logoHome')}" aria-label="${t('logoHome')}">
-                    <img src="${ROOT}/assets/img/spfx/vq-logo-white.svg" alt="Visit Qatar" class="sidebar-brand-image">
+                    <img src="${LOGO}" alt="Visit Qatar" class="sidebar-brand-image">
                 </a>
             </div>
             <nav class="sidebar" aria-label="${t('navMenu')}">
                 <ul class="nav-list">
-                    ${NAV_MAIN.map(n => `<li><a href="${href(n.page)}" class="nav-item ${isCurrent(n) ? 'is-active' : ''}" ${isCurrent(n) ? 'aria-current="page"' : ''} data-label="${esc(t(n.key))}" title="${esc(t(n.key))}">
-                        <span class="nav-icon"><i class="${n.icon}"></i></span><span class="nav-label">${t(n.key)}</span></a></li>`).join('')}
+                    ${NAV_MAIN.map(navItemHTML).join('')}
                 </ul>
             </nav>
         </div>`;
+    }
+
+    /* Sub-items (Departments → HR → Courses / VQ Structure): an indented list that opens from
+       the caret beside the parent and starts open while one of its pages is shown. */
+    function subNavHTML(list, depth) {
+        return `<ul class="nav-sub nav-sub-${depth}">
+            ${list.map(n => {
+                const self = isSelf(n);
+                return `<li><a href="${href(n.page, n.params)}" class="nav-sub-item ${self ? 'is-active' : ''} ${!self && isCurrent(n) ? 'is-parent' : ''}" ${self ? 'aria-current="page"' : ''}>
+                    <span class="nav-sub-label">${t(n.key)}</span></a>
+                    ${n.children ? subNavHTML(n.children, depth + 1) : ''}</li>`;
+            }).join('')}
+        </ul>`;
+    }
+
+    function navItemHTML(n) {
+        const current = isCurrent(n);
+        const attrs = `class="nav-item ${current ? 'is-active' : ''}" data-label="${esc(t(n.key))}" title="${esc(t(n.key))}"`;
+        const inner = `<span class="nav-icon"><i class="${n.icon}"></i></span><span class="nav-label">${t(n.key)}</span>`;
+        if (n.action) return `<li><button type="button" ${attrs} data-nav-action="${n.action}">${inner}</button></li>`;
+        const link = `<a href="${href(n.page)}" ${attrs} ${isSelf(n) ? 'aria-current="page"' : ''}>${inner}</a>`;
+        if (!n.children) return `<li>${link}</li>`;
+        const id = 'navSub-' + n.page;
+        return `<li class="nav-group ${current ? 'is-open' : ''}">
+            <div class="nav-group-row">${link}
+                <button type="button" class="nav-caret" data-nav-group aria-expanded="${current}" aria-controls="${id}" aria-label="${esc(t('navSubmenu'))}"><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>
+            </div>
+            <div class="nav-group-body" id="${id}">${subNavHTML(n.children, 1)}</div>
+        </li>`;
     }
 
     /* ---------- Side panel (RightPanel) and the compact top widgets ---------- */
@@ -356,6 +398,17 @@
         stayNights: 3.4,
         trend: [52, 58, 61, 55, 47, 39, 35, 41, 50, 63, 68, 72],
         markets: [['vsMarketGcc', 38], ['vsMarketEurope', 22], ['vsMarketAsia', 18], ['vsMarketAmericas', 9], ['vsMarketOther', 13]]
+    };
+
+    /* Team Spotlight card — DEMO CONTENT for the prototype (no staff-recognition feed yet) */
+    const TEAM_SPOTLIGHT = {
+        image: 'photo-1522071820081-009f0129c71c',
+        team: { ar: 'فريق الفعاليات والمعارض', en: 'Events & Exhibitions Team' },
+        text: {
+            ar: 'شكراً للفريق على تنظيم منتدى الشركاء وتنسيق مشاركة قطر للسياحة في المعارض الدولية هذا الموسم.',
+            en: 'Thank you to the team for delivering the Partners Forum and coordinating Visit Qatar at this season’s international trade shows.'
+        },
+        page: 'employees'
     };
 
     const panelHead = (title, aside) => `<div class="panel-head">
@@ -457,11 +510,23 @@
         </div>`;
     }
 
+    /* Current-month item under Theme of the Month. The month name always comes from today's
+       date (Arabic or English); the reminders are demo content kept per month in /data/month-focus.js. */
+    function monthFocusHTML() {
+        const now = today();
+        const name = new Intl.DateTimeFormat(isAr() ? 'ar-u-nu-latn' : 'en-US', { month: 'long' }).format(now);
+        const items = ((D.monthFocus || [])[now.getMonth()] || []).map(tx);
+        return `<div class="month-focus" aria-label="${esc(t('hpMonthFocus') + ': ' + name)}">
+            <span class="month-focus-label"><i class="fa-regular fa-calendar" aria-hidden="true"></i>${esc(name)}</span>
+            <ul class="month-focus-items">${items.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
+        </div>`;
+    }
+
     function utilBarHTML() {
         const next = nextPrayer();
         const w0 = WEATHER[0];
         return `<div class="util-bar">
-            ${PAGE === 'home' ? tickerHTML() : ''}
+            ${PAGE === 'home' ? `<div class="util-stack">${tickerHTML()}${monthFocusHTML()}</div>` : ''}
             <div class="util-widgets">
                 <div class="util-widget" data-widget="prayer">
                     <button type="button" class="util-chip" data-widget-toggle aria-expanded="false" aria-controls="prayerPanel" title="${esc(t('wgPrayerOpen'))}">
@@ -592,16 +657,40 @@
 
     /* ---------- Side panel: vision & mission · visitor statistics · links · hotlines ---------- */
 
-    function panelHTML() {
-        /* Compact link tiles (small icon + short label): the Option 1 "Software & System Links"
-           presentation the client preferred, rebuilt with Option 2's own tokens and classes. */
-        const linkItem = item => {
-            const url = item.page ? href(item.page, item.params) : item.url;
-            const ext = item.external ? ' target="_blank" rel="noopener noreferrer"' : '';
-            return `<li><a class="link-tile" href="${url}"${ext} title="${esc(t(item.key))}">
-                <span class="link-icon"><i class="${item.icon}"></i></span><span class="link-label">${t(item.key)}</span></a></li>`;
-        };
+    /* Compact link tiles (small icon + short label): the Option 1 "Software & System Links"
+       presentation the client preferred, rebuilt with Option 2's own tokens and classes.
+       Used by the side-panel Links card and by the Links menu item. */
+    function linkTileHTML(item) {
+        const url = item.page ? href(item.page, item.params) : item.url;
+        const ext = item.external ? ' target="_blank" rel="noopener noreferrer"' : '';
+        return `<li><a class="link-tile" href="${url}"${ext} title="${esc(t(item.key))}">
+            <span class="link-icon"><i class="${item.icon}"></i></span><span class="link-label">${t(item.key)}</span></a></li>`;
+    }
 
+    function openLinks() {
+        openModal({
+            title: esc(t('hpSystems')),
+            body: `<ul class="links-grid links-grid-modal">${LINKS.map(linkTileHTML).join('')}</ul>`,
+            footer: `<button type="button" class="btn btn-outline btn-sm" data-modal-close>${t('close')}</button>`
+        });
+    }
+
+    function teamSpotlightHTML() {
+        const S = TEAM_SPOTLIGHT;
+        return `<section class="panel-box ts-box" aria-label="${t('tsTitle')}">
+            ${panelHead(t('tsTitle'), `<span class="vs-demo">${t('sampleData')}</span>`)}
+            <div class="panel-body">
+                <a class="ts-card" href="${href(S.page)}">
+                    <span class="ts-image">${img(S.image, '', 500)}</span>
+                    <strong class="ts-team">${esc(tx(S.team))}</strong>
+                    <span class="ts-text">${esc(tx(S.text))}</span>
+                    <span class="vs-open">${t('tsCta')} <i class="fa-solid fa-arrow-left dir-flip" aria-hidden="true"></i></span>
+                </a>
+            </div>
+        </section>`;
+    }
+
+    function panelHTML() {
         return `<div class="prayer-times-section">
             <section class="panel-box" aria-label="${t('hpVision')}">
                 ${panelHead(t('hpVision'))}
@@ -619,10 +708,12 @@
 
             ${visitorStatsHTML()}
 
-            <section class="links-section" aria-label="${t('hpSystems')}">
+            ${teamSpotlightHTML()}
+
+            <section class="links-section" id="panelLinks" aria-label="${t('hpSystems')}">
                 ${panelHead(t('hpSystems'))}
                 <ul class="links-grid">
-                    ${LINKS.map(linkItem).join('')}
+                    ${LINKS.map(linkTileHTML).join('')}
                 </ul>
             </section>
 
@@ -667,7 +758,7 @@
         const add = (type, ic, title, meta, url, extra) =>
             list.push({ type, icon: ic, title: tx(title), meta, url, haystack: (both(title) + ' ' + meta + ' ' + (extra || '')).toLowerCase() });
 
-        NAV_MAIN.forEach(n => add('pages', n.icon, { ar: I18N.ar[n.key], en: I18N.en[n.key] }, t('filterPages'), href(n.page)));
+        flatNav(NAV_MAIN).filter(n => n.page).forEach(n => add('pages', n.icon || 'fa-solid fa-sitemap', { ar: I18N.ar[n.key], en: I18N.en[n.key] }, t('filterPages'), href(n.page, n.params)));
         (D.announcements || []).forEach(a => add('pages', 'fa-solid fa-bullhorn', a.title, `${t('navAnnouncements')} · ${a.number}`, href('announcement-details', { id: a.id }), both(a.summary)));
         (D.events || []).forEach(e => add('pages', 'fa-regular fa-calendar-check', e.title, `${t('navEvents')} · ${fmtDate(e.start)}`, href('event-details', { id: e.id }), both(e.location)));
         (D.news || []).forEach(n => add('pages', 'fa-regular fa-newspaper', n.title, `${t('navNews')} · ${fmtDate(n.date)}`, href('news-details', { id: n.id })));
@@ -748,13 +839,13 @@
         const toggle = $('#menuToggle');
         if (toggle) {
             toggle.setAttribute('aria-expanded', String(open));
-            toggle.setAttribute('aria-label', t(open ? 'closeMenu' : 'openMenu'));
+            toggle.setAttribute('aria-label', t(open ? 'collapseMenu' : 'openMenu'));
         }
         const sideToggle = $('#sidebarCollapseToggle');
         const mobile = window.innerWidth <= 1024;
         if (sideToggle && mobile) {
             sideToggle.setAttribute('aria-expanded', String(open));
-            sideToggle.setAttribute('aria-label', t('closeMenu'));
+            sideToggle.setAttribute('aria-label', t('collapseMenu'));
         }
         if (mobile && wasOpen && !open && toggle && document.activeElement && $('#siteMenu')?.contains(document.activeElement)) {
             toggle.focus({ preventScroll: true });
@@ -774,11 +865,11 @@
         if (window.innerWidth <= 1024) {
             const open = document.body.classList.contains('menu-open');
             toggle.setAttribute('aria-expanded', String(open));
-            toggle.setAttribute('aria-label', t('closeMenu'));
+            toggle.setAttribute('aria-label', t('collapseMenu'));
             return;
         }
         toggle.setAttribute('aria-expanded', String(!collapsed));
-        toggle.setAttribute('aria-label', t(collapsed ? 'openMenu' : 'closeMenu'));
+        toggle.setAttribute('aria-label', t(collapsed ? 'openMenu' : 'collapseMenu'));
     }
 
     function closeProfileMenu() {
@@ -1092,6 +1183,20 @@
                 return;
             }
             if (e.target.closest('#menuBackdrop')) { setMenu(false); return; }
+
+            const caret = e.target.closest('[data-nav-group]');
+            if (caret) {
+                const group = caret.closest('.nav-group');
+                const open = !group.classList.contains('is-open');
+                group.classList.toggle('is-open', open);
+                caret.setAttribute('aria-expanded', String(open));
+                return;
+            }
+            if (e.target.closest('[data-nav-action="links"]')) {
+                setMenu(false);
+                openLinks();
+                return;
+            }
 
             /* Compact prayer / weather widgets at the top of the page */
             const widgetBtn = e.target.closest('[data-widget-toggle]');

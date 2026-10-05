@@ -1,5 +1,5 @@
 /* Home — SPFx HomePage web part composition:
-   Internal Comms / Employee Relations circulars → VQ Calendar → VQ & QT Events →
+   Internal Comms / Employee Relations circulars (one featured card + links each) → VQ Calendar → VQ & QT Events →
    Tradeshows & Roadshows → Latest News → Discounts repository
    (Theme of the Month ticker and the compact prayer / weather widgets sit in the shell strip
    above; vision & mission, visitor statistics, links and hotlines live in the side panel) */
@@ -8,14 +8,16 @@
 
     /* VQ public events first, then QC staff events. Shows live in their own section. */
     const EVENT_IDS = ['global-perspectives', 'partners-forum', 'standup-taha', 'forbes-workshop'];
+    /* These four lead the discounts slider; the remaining discounts follow them */
     const DISCOUNT_IDS = ['pearl-gewan', 'restaurants', 'culture-tickets', 'fitness'];
 
-    const s = { day: null };
+    const s = { day: null, month: null };
 
     const byDateDesc = key => (a, b) => b[key].localeCompare(a[key]);
     const homeEvents = () => EVENT_IDS.map(id => D.events.find(e => e.id === id)).filter(Boolean);
     const homeShows = () => D.events.filter(e => e.group === 'shows').slice().sort((a, b) => b.start.localeCompare(a.start)).slice(0, 4);
-    const homeDiscounts = () => DISCOUNT_IDS.map(id => D.discounts.find(d => d.id === id)).filter(Boolean);
+    const homeDiscounts = () => DISCOUNT_IDS.map(id => D.discounts.find(d => d.id === id)).filter(Boolean)
+        .concat(D.discounts.filter(d => DISCOUNT_IDS.indexOf(d.id) === -1));
     const homeNews = () => D.news.slice().sort(byDateDesc('date')).slice(0, 6);
     const catOf = (list, key) => list.find(c => c.key === key);
 
@@ -31,22 +33,41 @@
         { owner: 'er', title: 'hpCircEr', sub: 'hpCircErOwner', icon: 'fa-user-group', cls: 'is-er' }
     ];
 
-    const circularsOf = owner => D.announcements.filter(a => a.owner === owner).sort(byDateDesc('start')).slice(0, 4);
+    /* Newest circular = the featured card; the next ones are listed as plain links beside it */
+    const MORE_LINKS = 4;
+    const circularsOf = owner => D.announcements.filter(a => a.owner === owner).sort(byDateDesc('start')).slice(0, 1 + MORE_LINKS);
 
     /* Same card composition as the Announcements listing page: the circular artwork that the
        type already carries (general.png / ceo.png / death.png / HR.png), the coloured type
-       strip, the type tag and circular number, then the title and the date. */
+       strip and the circular number, then the title, summary and date (no type label). */
     function circularCard(a) {
         const ty = ui.typeOfAnnouncement(a.type);
         return ui.listingCard({
             url: VQ.href('announcement-details', { id: a.id }),
             image: ty.image,
             overlay: `<span class="type-strip" style="background:${ty.color}"></span>`,
-            chips: ui.typeTag(ty) + ui.tag(`<span class="ltr">${esc(a.number)}</span>`, 'outline'),
+            chips: ui.tag(`<span class="ltr">${esc(a.number)}</span>`, 'outline'),
             title: esc(tx(a.title)),
+            desc: esc(tx(a.summary)),
             meta: `<span>${VQ.icon('calendar')}${VQ.fmtCardDate(a.start)}</span>`,
             button: false
         });
+    }
+
+    const circularLink = a => `<li><a class="circular-link" href="${VQ.href('announcement-details', { id: a.id })}">
+        <span class="circular-link-title">${esc(tx(a.title))}</span>
+        <span class="circular-link-date">${VQ.fmtDate(a.start, 'short')}</span>
+    </a></li>`;
+
+    function circularBody(list) {
+        const more = list.slice(1);
+        return `<div class="circular-body${more.length ? '' : ' is-single'}">
+            <div class="circular-feature">${circularCard(list[0])}</div>
+            ${more.length ? `<nav class="circular-links" aria-label="${esc(t('hpCircMore'))}">
+                <p class="circular-links-title">${t('hpCircMore')}</p>
+                <ul>${more.map(circularLink).join('')}</ul>
+            </nav>` : ''}
+        </div>`;
     }
 
     function circularBox(box) {
@@ -60,9 +81,7 @@
                 </span>
                 <a class="show-more" href="${VQ.href('announcements')}">${t('showAll')} ${ui.arrow()}</a>
             </header>
-            ${list.length
-                ? `<div class="circular-cards">${list.map(circularCard).join('')}</div>`
-                : `<p class="circular-empty">${t('hpCircEmpty')}</p>`}
+            ${list.length ? circularBody(list) : `<p class="circular-empty">${t('hpCircEmpty')}</p>`}
         </section>`;
     }
 
@@ -93,10 +112,20 @@
 
     const WEEKDAYS = { ar: ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'], en: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'] };
 
+    function startMonth(events) {
+        const month = VQ.isoDate(VQ.today()).slice(0, 7);
+        return events.some(e => e.start.slice(0, 7) <= month && e.end.slice(0, 7) >= month) ? month : homeEvents()[0].start.slice(0, 7);
+    }
+
+    function shiftMonth(month, step) {
+        const [y, m] = month.split('-').map(Number);
+        return VQ.isoDate(new Date(y, m - 1 + step, 1)).slice(0, 7);
+    }
+
     function calendarHTML() {
         const events = D.events.slice().sort((a, b) => a.start.localeCompare(b.start));
-        let month = VQ.isoDate(VQ.today()).slice(0, 7);
-        if (!events.some(e => e.start.slice(0, 7) <= month && e.end.slice(0, 7) >= month)) month = homeEvents()[0].start.slice(0, 7);
+        if (!s.month) s.month = startMonth(events);
+        const month = s.month;
 
         const [y, m] = month.split('-').map(Number);
         const first = new Date(y, m - 1, 1);
@@ -106,18 +135,31 @@
         const inMonth = events.filter(e => e.start <= monthEnd && e.end >= monthStart);
         const on = iso => inMonth.filter(e => e.start <= iso && e.end >= iso);
         const monthLabel = new Intl.DateTimeFormat(VQ.locale(), { month: 'long', year: 'numeric' }).format(first);
-        const cells = ui.calendarCells({ year: y, month: m, events: inMonth, selected: s.day });
+        const holidays = (D.holidays || []).filter(h => h.start <= monthEnd && h.end >= monthStart);
+        const cells = ui.calendarCells({ year: y, month: m, events: inMonth, selected: s.day, holidays });
+        const holidayDates = h => VQ.fmtRange(h.start < monthStart ? monthStart : h.start, h.end > monthEnd ? monthEnd : h.end, 'short');
 
         const shown = s.day ? on(s.day) : inMonth;
         return `<div class="calendar-layout">
             <div class="calendar-box">
-                <div class="calendar-head"><h4>${monthLabel}</h4><i class="fa-regular fa-calendar" style="color:var(--vq-teal)"></i></div>
+                <div class="calendar-head">
+                    <h4>${monthLabel}</h4>
+                    <div class="calendar-nav">
+                        <button type="button" class="slider-arrow" data-cal-month="-1" aria-label="${t('prevMonth')}">${ui.chevronPrev()}</button>
+                        <button type="button" class="slider-arrow" data-cal-month="1" aria-label="${t('nextMonth')}">${ui.chevronNext()}</button>
+                    </div>
+                </div>
                 <div class="calendar-weekdays">${WEEKDAYS[VQ.state.lang].map(d => `<span>${d}</span>`).join('')}</div>
                 <div class="calendar-grid">${cells}</div>
                 <div class="calendar-legend">
                     <span><i style="background:var(--vq-teal)"></i>${t('evCalEventDay')}</span>
                     <span><i style="background:rgba(215,107,0,.35)"></i>${t('evCalToday')}</span>
+                    <span><i class="legend-holiday"></i>${t('evCalHoliday')}</span>
                 </div>
+                ${holidays.length ? `<div class="calendar-holidays">
+                    <p>${t('evCalHolidays')}</p>
+                    <ul>${holidays.map(h => `<li><i class="legend-holiday" aria-hidden="true"></i><span>${esc(tx(h.title))}</span><small>${holidayDates(h)}</small></li>`).join('')}</ul>
+                </div>` : ''}
                 <p class="calendar-note"><i class="fa-solid fa-arrows-rotate"></i>${t('hpCalendarSync')}</p>
             </div>
             ${ui.calendarMap(shown)}
@@ -157,14 +199,14 @@
         );
     }
 
-    /* ---------- Discounts repository: 2 × 2 listing cards (not a “latest” feed) ---------- */
+    /* ---------- Discounts repository: listing cards in a slider (same pattern as Latest News) ---------- */
 
     function discountsHTML() {
         return ui.section(
             ui.sectionHead({ title: t('hpDiscounts'), link: VQ.href('discounts') }) +
             `<p class="section-desc">${t('hpDiscountsDesc')}</p>` +
-            `<div class="offers-grid">
-                ${homeDiscounts().map(d => {
+            `<div class="offers-slider">${ui.slider({ perView: 2, gap: '1rem', autoplay: 6500, arrows: true, items:
+                homeDiscounts().map(d => {
                     const cat = catOf(D.discountCategories, d.category);
                     return ui.listingCard({
                         url: VQ.href('discount-details', { id: d.id }),
@@ -176,8 +218,8 @@
                         meta: `<span class="meta-ruby"><i class="fa-regular fa-clock"></i>${t('dsValidUntil', { d: VQ.fmtDate(d.end, 'short') })}</span>`,
                         foot: `<span class="see-more">${t('seeMore')} ${ui.arrow()}</span>`
                     });
-                }).join('')}
-            </div>`
+                }) })}</div>`,
+            'home-discounts'
         );
     }
 
@@ -212,8 +254,14 @@
         setup(root) {
             root.addEventListener('click', e => {
                 const day = e.target.closest('[data-cal-day]');
-                if (day) {
-                    s.day = day.dataset.calDay && day.dataset.calDay !== s.day ? day.dataset.calDay : null;
+                const step = e.target.closest('[data-cal-month]');
+                if (day || step) {
+                    if (step) {
+                        s.month = shiftMonth(s.month, Number(step.dataset.calMonth));
+                        s.day = null;
+                    } else {
+                        s.day = day.dataset.calDay && day.dataset.calDay !== s.day ? day.dataset.calDay : null;
+                    }
                     const body = VQ.$('#eventsBody');
                     ui.unmountCalendarMaps(body);
                     body.innerHTML = calendarHTML();

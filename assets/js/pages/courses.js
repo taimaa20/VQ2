@@ -33,7 +33,7 @@
         title: () => t('crTitle'),
 
         render() {
-            VQ.content(ui.page([{ label: t('navCourses') }],
+            VQ.content(ui.page(ui.hrCrumbs().concat({ label: t('navCourses') }),
                 ui.pageHead({ title: t('crTitle'), desc: t('crDesc') }) +
                 ui.filterBar([
                     ui.filters(ui.searchField({ id: 'crQ', value: s.q, placeholder: t('crSearch') }) + ui.clearButton()),
