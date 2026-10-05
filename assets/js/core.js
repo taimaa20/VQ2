@@ -171,14 +171,29 @@
 
     /* ---------- Menu (Option 1 menu items and order) ---------- */
 
+    /* Pages that sit under one department in the menu (moved out of the main list) */
+    const DEPT_PAGES = {
+        hr: [
+            { key: 'navCourses', page: 'courses', also: ['course-details'] },
+            { key: 'navStructure', page: 'structure' }
+        ]
+    };
+
+    /* Departments → every department in /data/departments.js (same list and order as the
+       Departments page). The first one is what the Departments page shows without ?dept=. */
+    function deptNav() {
+        return (D.departments || []).map((d, i) => ({
+            label: d.name,
+            page: 'departments',
+            params: { dept: d.key },
+            isDefault: i === 0,
+            children: DEPT_PAGES[d.key]
+        }));
+    }
+
     const NAV_MAIN = [
         { key: 'navHome', icon: 'fa-solid fa-table-cells-large', page: 'home' },
-        { key: 'navDepts', icon: 'fa-solid fa-sitemap', page: 'departments', children: [
-            { key: 'navDeptHr', page: 'departments', params: { dept: 'hr' }, children: [
-                { key: 'navCourses', page: 'courses', also: ['course-details'] },
-                { key: 'navStructure', page: 'structure' }
-            ] }
-        ] },
+        { key: 'navDepts', icon: 'fa-solid fa-sitemap', page: 'departments', children: deptNav() },
         { key: 'navAnnouncements', icon: 'fa-solid fa-bullhorn', page: 'announcements', also: ['announcement-details'] },
         { key: 'navDiscounts', icon: 'fa-solid fa-tags', page: 'discounts', also: ['discount-details'] },
         { key: 'navCerts', icon: 'fa-solid fa-certificate', page: 'certificates' },
@@ -194,13 +209,15 @@
         { key: 'navEmployees', icon: 'fa-regular fa-address-book', page: 'employees' },
         { key: 'navLinks', icon: 'fa-solid fa-link', action: 'links' }
     ];
-    /* Courses and VQ Structure (BRD 6.1.10) sit under Departments → HR, not in the main list.
+    /* Departments lists every department; Courses and VQ Structure (BRD 6.1.10) sit under
+       Departments → HR, not in the main list.
        Links opens the same link tiles as the side-panel Links card. Discussion Board stays off the menu. */
 
     /* Every menu entry, including the Departments → HR sub-items (search index, active state) */
     const flatNav = list => list.reduce((all, n) => all.concat(n, n.children ? flatNav(n.children) : []), []);
 
-    const matchesParams = n => !n.params || Object.keys(n.params).every(k => param(k) === n.params[k]);
+    const matchesParams = n => !n.params || Object.keys(n.params).every(k => param(k) === n.params[k] || (n.isDefault && !param(k)));
+    const navLabel = n => (n.label ? tx(n.label) : t(n.key));
     const isSelf = n => !!n.page && (n.page === PAGE || (n.also || []).indexOf(PAGE) !== -1) && matchesParams(n);
     /* A parent stays highlighted while one of its sub-pages is open */
     const isCurrent = n => isSelf(n) || (n.children || []).some(isCurrent);
@@ -318,14 +335,14 @@
         </div>`;
     }
 
-    /* Sub-items (Departments → HR → Courses / VQ Structure): an indented list that opens from
+    /* Sub-items (Departments → each department; HR → Courses / VQ Structure): an indented list that opens from
        the caret beside the parent and starts open while one of its pages is shown. */
     function subNavHTML(list, depth) {
         return `<ul class="nav-sub nav-sub-${depth}">
             ${list.map(n => {
                 const self = isSelf(n);
                 return `<li><a href="${href(n.page, n.params)}" class="nav-sub-item ${self ? 'is-active' : ''} ${!self && isCurrent(n) ? 'is-parent' : ''}" ${self ? 'aria-current="page"' : ''}>
-                    <span class="nav-sub-label">${t(n.key)}</span></a>
+                    <span class="nav-sub-label">${esc(navLabel(n))}</span></a>
                     ${n.children ? subNavHTML(n.children, depth + 1) : ''}</li>`;
             }).join('')}
         </ul>`;
@@ -758,7 +775,7 @@
         const add = (type, ic, title, meta, url, extra) =>
             list.push({ type, icon: ic, title: tx(title), meta, url, haystack: (both(title) + ' ' + meta + ' ' + (extra || '')).toLowerCase() });
 
-        flatNav(NAV_MAIN).filter(n => n.page).forEach(n => add('pages', n.icon || 'fa-solid fa-sitemap', { ar: I18N.ar[n.key], en: I18N.en[n.key] }, t('filterPages'), href(n.page, n.params)));
+        flatNav(NAV_MAIN).filter(n => n.page).forEach(n => add('pages', n.icon || 'fa-solid fa-sitemap', n.label || { ar: I18N.ar[n.key], en: I18N.en[n.key] }, t('filterPages'), href(n.page, n.params)));
         (D.announcements || []).forEach(a => add('pages', 'fa-solid fa-bullhorn', a.title, `${t('navAnnouncements')} · ${a.number}`, href('announcement-details', { id: a.id }), both(a.summary)));
         (D.events || []).forEach(e => add('pages', 'fa-regular fa-calendar-check', e.title, `${t('navEvents')} · ${fmtDate(e.start)}`, href('event-details', { id: e.id }), both(e.location)));
         (D.news || []).forEach(n => add('pages', 'fa-regular fa-newspaper', n.title, `${t('navNews')} · ${fmtDate(n.date)}`, href('news-details', { id: n.id })));

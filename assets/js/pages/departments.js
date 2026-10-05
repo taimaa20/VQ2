@@ -86,7 +86,19 @@
             });
             root.addEventListener('click', e => {
                 const chip = e.target.closest('[data-chip="dept"]');
-                if (chip) { s.dept = chip.dataset.value; s.folder = null; s.q = ''; this.render(); return; }
+                if (chip) {
+                    s.dept = chip.dataset.value; s.folder = null; s.q = '';
+                    const url = new URL(location.href);
+                    url.searchParams.set('dept', s.dept);
+                    history.replaceState(null, '', url);
+                    VQ.$$('#siteMenu .nav-sub-item[href*="departments.html"]').forEach(a => {
+                        const on = new URL(a.href).searchParams.get('dept') === s.dept;
+                        a.classList.toggle('is-active', on);
+                        if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+                    });
+                    this.render();
+                    return;
+                }
                 const folder = e.target.closest('[data-folder]');
                 if (folder) {
                     s.folder = folder.dataset.folder || null;

@@ -35,7 +35,7 @@
     /* Departments → HR trail for the pages that sit under HR in the menu (Courses, VQ Structure) */
     const hrCrumbs = () => [
         { label: t('navDepts'), href: VQ.href('departments') },
-        { label: t('navDeptHr'), href: VQ.href('departments', { dept: 'hr' }) }
+        { label: VQ.deptName('hr'), href: VQ.href('departments', { dept: 'hr' }) }
     ];
 
     /* Breadcrumb + the single white surface */
