@@ -193,7 +193,6 @@
 
     const NAV_MAIN = [
         { key: 'navHome', icon: 'fa-solid fa-table-cells-large', page: 'home' },
-        { key: 'navHomeTicker', icon: 'fa-solid fa-bullseye', page: 'home-ticker' },
         { key: 'navDepts', icon: 'fa-solid fa-sitemap', page: 'departments', children: deptNav() },
         { key: 'navAnnouncements', icon: 'fa-solid fa-bullhorn', page: 'announcements', also: ['announcement-details'] },
         { key: 'navDiscounts', icon: 'fa-solid fa-tags', page: 'discounts', also: ['discount-details'] },

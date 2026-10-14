@@ -1,10 +1,9 @@
-/* Gallery — photo albums and the video library on one page, with one filter. */
+/* Gallery — photo albums and the video library on one page, with one search. */
 (function () {
     const { t, tx, esc, ui, D } = VQ;
     const PAGE_SIZE = 6;
     const s = {
         q: '',
-        filter: 'all',
         photos: { page: 1 },
         videos: {
             page: 1,
@@ -13,8 +12,6 @@
     };
 
     const catOf = key => D.videoCategories.find(c => c.key === key);
-    const showPhotos = () => s.filter === 'all' || s.filter === 'photos';
-    const showVideos = () => s.filter !== 'photos';
 
     function albums() {
         const q = s.q.trim().toLowerCase();
@@ -25,9 +22,7 @@
 
     function videos() {
         const q = s.q.trim().toLowerCase();
-        const cat = s.filter !== 'all' && s.filter !== 'photos' ? s.filter : 'all';
         return D.videos
-            .filter(v => cat === 'all' || v.category === cat)
             .filter(v => !q || (v.title.ar + ' ' + v.title.en + ' ' + v.description.ar + ' ' + v.description.en).toLowerCase().includes(q))
             .sort((a, b) => b.date.localeCompare(a.date));
     }
@@ -92,11 +87,8 @@
     }
 
     function filterBar() {
-        const tabs = [{ value: 'all', label: t('all') }, { value: 'photos', label: t('pgTitle'), icon: 'fa-images' }]
-            .concat(D.videoCategories.map(c => ({ value: c.key, label: tx(c.label), icon: c.icon })));
         return `<div class="filter-search-section gallery-filter">
             ${ui.filters(ui.searchField({ id: 'galQ', value: s.q, placeholder: t('galSearch') }) + ui.clearButton())}
-            ${ui.tabs({ name: 'filter', active: s.filter, label: t('category'), items: tabs })}
         </div>`;
     }
 
@@ -107,12 +99,12 @@
             VQ.content(ui.page([{ label: t('navGallery') }],
                 ui.pageHead({ title: t('navGallery'), desc: t('galDesc') }) +
                 filterBar() +
-                (showPhotos() ? ui.section(`<div id="photoResults" data-pager="photos">${photoResults()}</div>`, 'gallery-photos') : '') +
-                (showVideos() ? ui.section(
+                ui.section(`<div id="photoResults" data-pager="photos">${photoResults()}</div>`, 'gallery-photos') +
+                ui.section(
                     `<div id="nowPlaying" style="margin-bottom:1.5rem">${nowPlaying()}</div>` +
                     `<div id="videoResults" data-pager="videos">${videoResults()}</div>`,
                     'gallery-videos'
-                ) : '')
+                )
             ));
         },
 
@@ -122,23 +114,12 @@
                 s.q = e.target.value;
                 s.photos.page = 1;
                 s.videos.page = 1;
-                const photos = VQ.$('#photoResults');
-                const videos = VQ.$('#videoResults');
-                if (photos) photos.innerHTML = photoResults();
-                if (videos) videos.innerHTML = videoResults();
+                VQ.$('#photoResults').innerHTML = photoResults();
+                VQ.$('#videoResults').innerHTML = videoResults();
             });
             root.addEventListener('click', e => {
                 if (e.target.closest('#clearFilters')) {
                     s.q = '';
-                    s.filter = 'all';
-                    s.photos.page = 1;
-                    s.videos.page = 1;
-                    this.render();
-                    return;
-                }
-                const chip = e.target.closest('[data-chip]');
-                if (chip) {
-                    s.filter = chip.dataset.value;
                     s.photos.page = 1;
                     s.videos.page = 1;
                     this.render();
