@@ -36,14 +36,14 @@
         title: () => tx(album.title),
 
         render() {
-            VQ.content(ui.page([{ label: t('navPhotos'), href: VQ.href('photo-gallery') }, { label: tx(album.title) }],
+            VQ.content(ui.page([{ label: t('navGallery'), href: VQ.href('gallery') }, { label: tx(album.title) }],
                 ui.detailsHead({
                     title: esc(tx(album.title)),
                     dates: `<span>${VQ.fmtDate(album.date, 'long')}</span>`,
                     meta: [{ icon: 'fa-regular fa-images', text: t('pgPhotos', { n: album.photos.length }) }]
                 }) +
                 `<div class="photo-grid">${album.photos.map((p, i) => `<button type="button" class="photo-tile" data-photo="${i}" aria-label="${i + 1}">${VQ.img(p, '', i === 0 ? 1200 : 600)}</button>`).join('')}</div>` +
-                ui.backToListing(t('backTo', { x: t('navPhotos') }), VQ.href('photo-gallery'))
+                ui.backToListing(t('backTo', { x: t('navGallery') }), VQ.href('gallery'))
             ));
         },
 

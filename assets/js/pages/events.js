@@ -30,9 +30,6 @@
     function hero(e) {
         const cat = catOf(e.category);
         return `<a href="${VQ.href('event-details', { id: e.id })}" class="event-hero">
-            ${VQ.img(e.image, 'event-hero-bg', 1400)}
-            <span class="event-hero-shade"></span>
-            <span class="event-hero-arch"><strong>${VQ.fmtDay(e.start)}</strong><span>${VQ.fmtMonth(e.start)}</span></span>
             <div class="event-hero-copy">
                 <span class="event-hero-badge"><i class="fa-solid fa-star"></i>${t('evNext')}</span>
                 <h2>${esc(tx(e.title))}</h2>
@@ -44,6 +41,7 @@
                 </div>
                 <span class="event-hero-cta">${t('viewDetails')} ${ui.arrow()}</span>
             </div>
+            <span class="event-hero-arch"><strong>${VQ.fmtDay(e.start)}</strong><span>${VQ.fmtMonth(e.start)}</span></span>
         </a>`;
     }
 

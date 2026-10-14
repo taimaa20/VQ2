@@ -64,6 +64,7 @@ window.VQ_I18N = {
         /* Menu */
         navMenu: 'القائمة الرئيسية',
         navHome: 'الصفحة الرئيسية',
+        navHomeTicker: 'الصفحة الرئيسية — الشريط',
         navDepts: 'الإدارات',
         navAnnouncements: 'الإعلانات',
         navDiscounts: 'الخصومات',
@@ -76,6 +77,7 @@ window.VQ_I18N = {
         navHotlines: 'الخطوط الساخنة',
         navCourses: 'الدورات',
         navUserGuide: 'دليل المستخدم',
+        navGallery: 'المعرض',
         navPhotos: 'معرض الصور',
         navVideos: 'معرض الفيديو',
         navGalleries: 'المعارض',
@@ -266,6 +268,8 @@ window.VQ_I18N = {
         ugExternalNote: 'يُفتح المصدر التعليمي في نافذة جديدة دون مغادرة البوابة.',
 
         /* Media */
+        galDesc: 'ألبومات الصور وفيديوهات التهيئة والتدريب والسلامة في صفحة واحدة.',
+        galSearch: 'ابحث في المعرض...',
         pgTitle: 'معرض الصور',
         pgDesc: 'ألبومات صور فعاليات وأنشطة قطر للسياحة، مرتبة من الأحدث إلى الأقدم.',
         pgSearch: 'ابحث في الألبومات...',
@@ -349,6 +353,11 @@ window.VQ_I18N = {
         /* شريط محور الشهر (محتوى ثابت في النموذج التوضيحي) */
         hpTheme: 'محور الشهر',
         hpThemeMessage: 'محور الشهر: التخطيط التجاري وإعداد الموازنة',
+        hpThemes: [
+            'التخطيط التجاري وإعداد الموازنة',
+            'تطوير معايير الضيافة',
+            'الاستعداد لموسم الفعاليات والمعارض'
+        ],
         hpMonthFocus: 'أنشطة الشهر',
 
         /* تعاميم الصفحة الرئيسية — صندوقان منفصلان */
@@ -360,6 +369,7 @@ window.VQ_I18N = {
         hpCircMore: 'تعاميم أخرى',
 
         /* عناصر مصغّرة أعلى الصفحة: الصلاة والطقس */
+        wgThemeOpen: 'عرض محور الشهر',
         wgPrayerOpen: 'عرض مواقيت الصلاة',
         wgWeatherOpen: 'عرض تفاصيل الطقس',
         wgNextPrayer: 'الصلاة التالية',
@@ -491,6 +501,7 @@ window.VQ_I18N = {
         /* Menu */
         navMenu: 'Main menu',
         navHome: 'Homepage',
+        navHomeTicker: 'Homepage — ticker',
         navDepts: 'Departments',
         navAnnouncements: 'Announcements',
         navDiscounts: 'Discounts',
@@ -503,6 +514,7 @@ window.VQ_I18N = {
         navHotlines: 'Hotlines',
         navCourses: 'Courses',
         navUserGuide: 'User Guide',
+        navGallery: 'Gallery',
         navPhotos: 'Photo Gallery',
         navVideos: 'Video Gallery',
         navGalleries: 'Galleries',
@@ -693,6 +705,8 @@ window.VQ_I18N = {
         ugExternalNote: 'The learning resource opens in a new tab without leaving the portal.',
 
         /* Media */
+        galDesc: 'Photo albums and onboarding, training and safety videos on one page.',
+        galSearch: 'Search the gallery...',
         pgTitle: 'Photo Gallery',
         pgDesc: 'Photo albums from Visit Qatar events and activities, newest first.',
         pgSearch: 'Search albums...',
@@ -776,6 +790,11 @@ window.VQ_I18N = {
         /* Theme of the Month ticker (static prototype content) */
         hpTheme: 'Theme of the Month',
         hpThemeMessage: 'Theme of the Month: Business Planning & Budget Preparation',
+        hpThemes: [
+            'Business Planning & Budget Preparation',
+            'Hospitality standards development',
+            'Events and trade-show season readiness'
+        ],
         hpMonthFocus: 'This month',
 
         /* Homepage circulars — two separate boxes */
@@ -787,6 +806,7 @@ window.VQ_I18N = {
         hpCircMore: 'More circulars',
 
         /* Compact top widgets: prayer and weather */
+        wgThemeOpen: 'Show theme of the month',
         wgPrayerOpen: 'Show prayer times',
         wgWeatherOpen: 'Show weather details',
         wgNextPrayer: 'Next prayer',

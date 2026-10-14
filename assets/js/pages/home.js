@@ -1,7 +1,7 @@
 /* Home — SPFx HomePage web part composition:
    Internal Comms / Employee Relations circulars (one featured card + links each) → VQ Calendar → VQ & QT Events →
    Tradeshows & Roadshows → Latest News → Discounts repository
-   (Theme of the Month ticker and the compact prayer / weather widgets sit in the shell strip
+   (The current-month strip and the theme, prayer, and weather chips sit in the shell strip
    above; vision & mission, visitor statistics, links and hotlines live in the side panel) */
 (function () {
     const { t, tx, esc, ui, D } = VQ;
@@ -49,7 +49,7 @@
             chips: ui.tag(`<span class="ltr">${esc(a.number)}</span>`, 'outline'),
             title: esc(tx(a.title)),
             desc: esc(tx(a.summary)),
-            meta: `<span>${VQ.icon('calendar')}${VQ.fmtCardDate(a.start)}</span>`,
+            meta: `<span class="meta-ruby"><i class="fa-regular fa-calendar" aria-hidden="true"></i>${VQ.fmtCardDate(a.start)}</span>`,
             button: false
         });
     }
@@ -92,22 +92,19 @@
 
     /* ---------- VQ Calendar, then QC Events (separate sections, no view switch) ---------- */
 
+    /* Same compact horizontal card as the discounts slider */
     function eventCard(e) {
         const cat = catOf(D.eventCategories, e.category);
-        return `<a href="${VQ.href('event-details', { id: e.id })}" class="event-card">
-            <div class="card-Event">${VQ.img(e.image, '', 800)}${ui.cardDate(e.start, 'is-bottom')}</div>
-            <div class="card-details">
-                <div class="card-info">
-                    <div class="card-chips">${ui.tag(tx(cat.label), '', cat.icon)}${e.owner ? ui.tag(t(e.owner === 'vq' ? 'evOwnerVq' : 'evOwnerQc')) : ''}</div>
-                    <h3 class="card-title">${esc(tx(e.title))}</h3>
-                    <p class="card-description">${esc(tx(e.summary))}</p>
-                </div>
-                <div class="card-foot">
-                    <span class="card-meta"><span><i class="fa-solid fa-location-dot"></i>${esc(tx(e.location))}</span></span>
-                    <span class="see-more">${t('seeMore')} ${ui.arrow()}</span>
-                </div>
-            </div>
-        </a>`;
+        return ui.listingCard({
+            url: VQ.href('event-details', { id: e.id }),
+            image: e.image,
+            date: e.start,
+            chips: ui.tag(tx(cat.label), '', cat.icon) + (e.owner ? ui.tag(t(e.owner === 'vq' ? 'evOwnerVq' : 'evOwnerQc')) : ''),
+            title: esc(tx(e.title)),
+            meta: `<span><i class="fa-solid fa-location-dot"></i>${esc(tx(e.location))}</span>`,
+            foot: `<span class="see-more">${t('seeMore')} ${ui.arrow()}</span>`,
+            button: false
+        });
     }
 
     const WEEKDAYS = { ar: ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'], en: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'] };
@@ -183,7 +180,7 @@
                 title: t('hpEvents'),
                 link: VQ.href('events')
             }) +
-            ui.slider({ items: homeEvents().map(eventCard), perView: 2, gap: '1rem', arrows: true }),
+            `<div class="offers-slider">${ui.slider({ items: homeEvents().map(eventCard), perView: 2, gap: '1rem', arrows: true })}</div>`,
             'home-events'
         );
     }
@@ -194,7 +191,7 @@
                 title: t('hpShows'),
                 link: VQ.href('events', { group: 'shows' })
             }) +
-            ui.slider({ items: homeShows().map(eventCard), perView: 2, gap: '1rem', arrows: true }),
+            `<div class="offers-slider">${ui.slider({ items: homeShows().map(eventCard), perView: 2, gap: '1rem', arrows: true })}</div>`,
             'home-events home-shows'
         );
     }

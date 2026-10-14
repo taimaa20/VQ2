@@ -193,6 +193,7 @@
 
     const NAV_MAIN = [
         { key: 'navHome', icon: 'fa-solid fa-table-cells-large', page: 'home' },
+        { key: 'navHomeTicker', icon: 'fa-solid fa-bullseye', page: 'home-ticker' },
         { key: 'navDepts', icon: 'fa-solid fa-sitemap', page: 'departments', children: deptNav() },
         { key: 'navAnnouncements', icon: 'fa-solid fa-bullhorn', page: 'announcements', also: ['announcement-details'] },
         { key: 'navDiscounts', icon: 'fa-solid fa-tags', page: 'discounts', also: ['discount-details'] },
@@ -203,8 +204,7 @@
         { key: 'navSurveys', icon: 'fa-solid fa-square-poll-vertical', page: 'surveys' },
         { key: 'navPolicies', icon: 'fa-regular fa-folder-open', page: 'policies' },
         { key: 'navHotlines', icon: 'fa-solid fa-headset', page: 'hotlines' },
-        { key: 'navPhotos', icon: 'fa-solid fa-images', page: 'photo-gallery', also: ['album'] },
-        { key: 'navVideos', icon: 'fa-solid fa-circle-play', page: 'video-library' },
+        { key: 'navGallery', icon: 'fa-solid fa-images', page: 'gallery', also: ['album'] },
         { key: 'navUserGuide', icon: 'fa-solid fa-book-open', page: 'user-guide' },
         { key: 'navEmployees', icon: 'fa-regular fa-address-book', page: 'employees' },
         { key: 'navLinks', icon: 'fa-solid fa-link', action: 'links' }
@@ -257,6 +257,7 @@
             </div>
 
             <div class="navbar-right">
+                <div class="header-mid">
                 <div class="search-box" id="searchWrap">
                     <button type="button" class="search-toggle" id="searchToggle" aria-expanded="false" aria-controls="globalSearch" aria-label="${t('searchLabel')}">
                         <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
@@ -274,6 +275,8 @@
                         <div class="search-panel-results" id="searchResults"></div>
                         <a class="search-panel-all" id="searchAll" href="${href('search')}">${t('searchViewAll')}</a>
                     </div>
+                </div>
+                <div class="header-widget-slot" id="headerWidgetSlot"></div>
                 </div>
 
                 <div class="header-tools">
@@ -353,9 +356,11 @@
         const attrs = `class="nav-item ${current ? 'is-active' : ''}" data-label="${esc(t(n.key))}" title="${esc(t(n.key))}"`;
         const inner = `<span class="nav-icon"><i class="${n.icon}"></i></span><span class="nav-label">${t(n.key)}</span>`;
         if (n.action) return `<li><button type="button" ${attrs} data-nav-action="${n.action}">${inner}</button></li>`;
-        const link = `<a href="${href(n.page)}" ${attrs} ${isSelf(n) ? 'aria-current="page"' : ''}>${inner}</a>`;
-        if (!n.children) return `<li>${link}</li>`;
-        const id = 'navSub-' + n.page;
+        if (!n.children) return `<li><a href="${href(n.page)}" ${attrs} ${isSelf(n) ? 'aria-current="page"' : ''}>${inner}</a></li>`;
+        const id = 'navSub-' + (n.page || n.key);
+        const link = n.page
+            ? `<a href="${href(n.page)}" ${attrs} ${isSelf(n) ? 'aria-current="page"' : ''}>${inner}</a>`
+            : `<button type="button" ${attrs} data-nav-group aria-expanded="${current}" aria-controls="${id}">${inner}</button>`;
         return `<li class="nav-group ${current ? 'is-open' : ''}">
             <div class="nav-group-row">${link}
                 <button type="button" class="nav-caret" data-nav-group aria-expanded="${current}" aria-controls="${id}" aria-label="${esc(t('navSubmenu'))}"><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>
@@ -509,26 +514,10 @@
         </section>`;
     }
 
-    /* ---------- Compact top strip: Theme of the Month ticker + prayer / weather widgets ---------- */
+    /* ---------- Compact top strip: current month + theme / prayer / weather widgets ---------- */
 
-    /* The message is repeated TICKER_COPIES times and the track slides by exactly one copy
-       (1 / TICKER_COPIES = 12.5%), so the loop is seamless and the strip is never half empty. */
-    const TICKER_COPIES = 8;
-
-    function tickerHTML() {
-        const message = esc(t('hpThemeMessage'));
-        const items = Array.from({ length: TICKER_COPIES }, (v, i) =>
-            `<span class="ticker-item"${i ? ' aria-hidden="true"' : ''}>${message}</span>`).join('');
-        return `<div class="ticker" aria-label="${esc(t('hpTheme'))}">
-            <span class="ticker-label"><i class="fa-solid fa-bullseye" aria-hidden="true"></i>${t('hpTheme')}</span>
-            <div class="ticker-viewport">
-                <div class="ticker-track">${items}</div>
-            </div>
-        </div>`;
-    }
-
-    /* Current-month item under Theme of the Month. The month name always comes from today's
-       date (Arabic or English); the reminders are demo content kept per month in /data/month-focus.js. */
+    /* Current month fills the strip. The month name always comes from today's date
+       (Arabic or English); the reminders are demo content kept per month in /data/month-focus.js. */
     function monthFocusHTML() {
         const now = today();
         const name = new Intl.DateTimeFormat(isAr() ? 'ar-u-nu-latn' : 'en-US', { month: 'long' }).format(now);
@@ -539,12 +528,45 @@
         </div>`;
     }
 
+    function themeCardHTML() {
+        const items = t('hpThemes');
+        const list = Array.isArray(items) && items.length ? items : [t('hpThemeMessage')];
+        return `<section class="panel-box theme-box" aria-label="${t('hpTheme')}">
+            ${panelHead(t('hpTheme'), `<i class="fa-solid fa-bullseye"></i>`)}
+            <ul class="theme-list">${list.map(item => `<li>${esc(item)}</li>`).join('')}</ul>
+        </section>`;
+    }
+
+    function tickerHTML() {
+        const label = t('hpTheme');
+        const message = esc(t('hpThemeMessage'));
+        const copies = Array.from({ length: 8 }, (_, i) => `<span class="ticker-item"${i ? ' aria-hidden="true"' : ''}>${message}</span>`).join('');
+        return `<div class="ticker" aria-label="${esc(label)}">
+            <span class="ticker-label"><i class="fa-solid fa-bullseye" aria-hidden="true"></i>${esc(label)}</span>
+            <div class="ticker-viewport">
+                <div class="ticker-track">${copies}</div>
+            </div>
+        </div>`;
+    }
+
     function utilBarHTML() {
         const next = nextPrayer();
         const w0 = WEATHER[0];
+        const strip = PAGE === 'home-ticker'
+            ? `<div class="util-stack">${monthFocusHTML()}${tickerHTML()}</div>`
+            : (PAGE === 'home' ? monthFocusHTML() : '');
         return `<div class="util-bar">
-            ${PAGE === 'home' ? `<div class="util-stack">${tickerHTML()}${monthFocusHTML()}</div>` : ''}
+            ${strip}
             <div class="util-widgets">
+                ${PAGE === 'home-ticker' ? '' : `<div class="util-widget" data-widget="theme">
+                    <button type="button" class="util-chip" data-widget-toggle aria-expanded="false" aria-controls="themePanel" title="${esc(t('wgThemeOpen'))}">
+                        <span class="util-chip-icon"><i class="fa-solid fa-bullseye" aria-hidden="true"></i></span>
+                        <span class="util-chip-text"><strong>${t('hpTheme')}</strong></span>
+                        <i class="fa-solid fa-chevron-down util-chip-caret" aria-hidden="true"></i>
+                        <span class="sr-only">${t('wgThemeOpen')}</span>
+                    </button>
+                    <div class="util-pop" id="themePanel" hidden>${themeCardHTML()}</div>
+                </div>`}
                 <div class="util-widget" data-widget="prayer">
                     <button type="button" class="util-chip" data-widget-toggle aria-expanded="false" aria-controls="prayerPanel" title="${esc(t('wgPrayerOpen'))}">
                         <span class="util-chip-icon"><i class="fa-solid fa-mosque" aria-hidden="true"></i></span>
@@ -785,7 +807,7 @@
         (D.policies || []).forEach(doc => add('documents', 'fa-solid ' + fileIcon(doc.ext).icon, doc.title, `${fileIcon(doc.ext).ext} · ${t('navPolicies')}`, href('policies', { doc: doc.id })));
         (D.certificates || []).forEach(c => add('documents', 'fa-solid fa-certificate', { ar: `${c.standard} — ${c.title.ar}`, en: `${c.standard} — ${c.title.en}` }, t('navCerts'), href('certificates', { cert: c.id })));
         (D.albums || []).forEach(a => add('images', 'fa-regular fa-image', a.title, `${t('navPhotos')} · ${t('pgPhotos', { n: a.photos.length })}`, href('album', { id: a.id })));
-        (D.videos || []).forEach(v => add('videos', 'fa-regular fa-circle-play', v.title, `${t('navVideos')} · ${v.length}`, href('video-library', { id: v.id })));
+        (D.videos || []).forEach(v => add('videos', 'fa-regular fa-circle-play', v.title, `${t('navVideos')} · ${v.length}`, href('gallery', { id: v.id })));
         (D.guides || []).filter(g => !g.hidden && !((D.guideSystems || []).find(x => x.key === g.system) || {}).hidden).forEach(g => {
             const type = g.kind === 'video' ? 'videos' : g.kind === 'image' ? 'images' : 'pages';
             const ic = g.kind === 'video' ? 'fa-regular fa-circle-play' : g.kind === 'image' ? 'fa-regular fa-image' : 'fa-solid fa-arrow-up-right-from-square';
@@ -845,7 +867,8 @@
 
     function applyFontScale() {
         state.fontScale = Math.min(1.2, Math.max(0.85, Math.round(state.fontScale * 100) / 100));
-        document.documentElement.style.fontSize = (16 * state.fontScale) + 'px';
+        const desktopArabic = isAr() && window.matchMedia('(min-width: 1500px)').matches;
+        document.documentElement.style.fontSize = (16 * (desktopArabic ? 1.2 : 1) * state.fontScale) + 'px';
         store.set('vq2-font-scale', String(state.fontScale));
     }
 
@@ -988,12 +1011,29 @@
         }, 5000);
     }
 
+    /* Phones and tablets: prayer and weather sit in the header, to the right of search. */
+    let headerWidgetsMobile = null;
+    function placeHeaderWidgets() {
+        const slot = $('#headerWidgetSlot');
+        const widgets = $('.util-widgets');
+        const prayer = $('.util-widget[data-widget="prayer"]');
+        const weather = $('.util-widget[data-widget="weather"]');
+        if (!slot || !widgets || !prayer || !weather) return;
+        const mobile = window.matchMedia('(max-width: 1024px)').matches;
+        if (headerWidgetsMobile !== null && headerWidgetsMobile !== mobile) closeWidgets();
+        headerWidgetsMobile = mobile;
+        const target = mobile ? slot : widgets;
+        if (prayer.parentElement !== target) target.appendChild(prayer);
+        if (weather.parentElement !== target) target.appendChild(weather);
+    }
+
     function renderChrome() {
         document.body.classList.remove('search-open');
         $('#siteHeader').innerHTML = headerHTML();
         $('#siteMenu').innerHTML = menuHTML();
         bindHeader();
         $('#utilBar').innerHTML = utilBarHTML();
+        placeHeaderWidgets();
         $('#sidePanel').innerHTML = panelHTML();
         $('#siteFooter').innerHTML = footerHTML();
         startVision();
@@ -1032,6 +1072,7 @@
         url.searchParams.set('lang', state.lang);
         history.replaceState(null, '', url);
         applyDirection();
+        applyFontScale();
         closeModal();
         renderChrome();
         renderPage();
@@ -1188,7 +1229,11 @@
     let resizeRaf = null;
     window.addEventListener('resize', () => {
         cancelAnimationFrame(resizeRaf);
-        resizeRaf = requestAnimationFrame(() => $$('[data-slider]').forEach(sl => goSlide(sl, Number(sl.dataset.index || 0), true)));
+        resizeRaf = requestAnimationFrame(() => {
+            applyFontScale();
+            placeHeaderWidgets();
+            $$('[data-slider]').forEach(sl => goSlide(sl, Number(sl.dataset.index || 0), true));
+        });
     });
 
     /* ---------- Global delegated behaviours ---------- */
@@ -1204,9 +1249,16 @@
             const caret = e.target.closest('[data-nav-group]');
             if (caret) {
                 const group = caret.closest('.nav-group');
+                if (document.body.classList.contains('nav-collapsed') && window.innerWidth > 1024) {
+                    desktopCollapsed = false;
+                    setSidebarCollapsed(false);
+                    group.classList.add('is-open');
+                    group.querySelectorAll('[data-nav-group]').forEach(btn => btn.setAttribute('aria-expanded', 'true'));
+                    return;
+                }
                 const open = !group.classList.contains('is-open');
                 group.classList.toggle('is-open', open);
-                caret.setAttribute('aria-expanded', String(open));
+                group.querySelectorAll('[data-nav-group]').forEach(btn => btn.setAttribute('aria-expanded', String(open)));
                 return;
             }
             if (e.target.closest('[data-nav-action="links"]')) {

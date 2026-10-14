@@ -223,7 +223,7 @@ body:not(.nav-collapsed) .sidebar-collapse-toggle .menu-icon-collapse { display:
 .header-tools { display: flex; align-items: center; gap: 0.6rem; min-width: 0; flex-shrink: 0; }
 .header-logo { display: none; align-items: center; line-height: 0; flex-shrink: 0; }
 .header-logo:hover { opacity: 0.9; }
-.header-logo img { height: 2.35rem; width: auto; max-width: 7.2rem; }
+.header-logo img { height: 1.85rem; width: auto; max-width: 5.6rem; }
 
 .logo-area { flex-shrink: 0; display: flex; align-items: center; padding: 0.25rem 0.5rem; margin-inline-end: 0.5rem; }
 .logo-link { display: flex; line-height: 0; }
@@ -251,6 +251,8 @@ body:not(.nav-collapsed) .sidebar-collapse-toggle .menu-icon-collapse { display:
 .link-item.is-active { background: var(--teal-tint); color: var(--vq-ruby); }
 
 .navbar-right { display: flex; align-items: center; gap: 0.6rem; margin-inline-start: auto; min-width: 0; }
+.header-mid { display: contents; }
+.header-widget-slot:empty { display: none; }
 
 .search-box { position: relative; }
 .search-toggle {
@@ -720,7 +722,7 @@ body.nav-collapsed .nav-item.is-active {
 @media (min-width: 1025px) {
     .header-start { display: flex; }
     .header-logo { display: inline-flex; }
-    .header-logo img { height: 3.4rem; max-width: none; }
+    .header-logo img { height: 2.65rem; max-width: none; }
     .sidebar-brand { display: none; }
     .sidebar-header { padding: 0.55rem 0 0.15rem; }
     .sidebar-collapse-toggle { margin: 0; }
@@ -802,6 +804,19 @@ body.nav-collapsed .nav-item.is-active {
    Controls — AdsPage filter bar, pills, tabs, buttons
    ========================================================================== */
 .filter-search-section { display: flex; flex-direction: column; gap: 0.85rem; padding-bottom: 1.35rem; margin-bottom: 1.35rem; border-bottom: 1px solid var(--line-soft); }
+/* Gallery uses one filter for albums and videos */
+.gallery-filter.filter-search-section {
+    gap: 0.75rem;
+    padding: 0.85rem;
+    margin-bottom: 1.5rem;
+    background: #f7fbfc;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+}
+.gallery-filter .filters > .search-container { flex: 1 1 14rem; background: #fff; min-height: 2.75rem; }
+.gallery-filter .filters > .btn-clear { flex: 0 0 auto; width: auto; }
+.gallery-filter .discount-category-tabs { gap: 0.4rem; }
+.gallery-filter .discount-category-tab { background: #fff; border-radius: 999px; padding: 0.38rem 0.95rem; }
 .filters { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
 
 .search-container {
@@ -1220,8 +1235,8 @@ a.listing-card:hover .card-title { color: var(--vq-teal); }
 .view-switch button.active { background: var(--vq-teal); color: #fff; box-shadow: 0 2px 6px rgba(0, 98, 108, 0.25); }
 
 /* Month calendar — one teal highlight for every day in an event range */
-.calendar-layout { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
-.calendar-box { border: 1px solid var(--line); border-radius: 1rem; padding: 1rem; background: #fff; }
+.calendar-layout { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 1.5rem; align-items: stretch; }
+.calendar-box { height: 100%; border: 1px solid var(--line); border-radius: 1rem; padding: 1rem; background: #fff; }
 .calendar-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
 .calendar-head h4 { font-size: 1rem; color: var(--vq-teal); }
 .calendar-weekdays, .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); text-align: center; }
@@ -1276,27 +1291,32 @@ button.cal-day.has-event.is-holiday::after { content: ""; position: absolute; bo
 .offers-grid .card-title,
 .offers-slider .card-title { font-size: 0.95rem; color: var(--vq-teal); }
 .offers-slider .listing-card { height: 100%; }
+.home-events .card-chips { flex-direction: column; align-items: flex-start; flex-wrap: nowrap; gap: 0.25rem; margin-bottom: 0.25rem; }
+.home-events .card-chips .tag { white-space: nowrap; }
+.home-events .card-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
 
-/* Next event banner (SPFx NewHomePage .nhp-hero with the arch outline) */
-.event-hero { position: relative; display: block; overflow: hidden; border-radius: var(--radius-lg); background: var(--vq-teal); color: #fff; min-height: 15.5rem; margin-bottom: 1.5rem; box-shadow: inset 0 -1.5rem 2rem rgba(0, 75, 83, 0.18); }
-.event-hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.34; transition: transform 0.8s ease; }
-.event-hero:hover .event-hero-bg { transform: scale(1.03); }
-.event-hero-shade { position: absolute; inset: 0; background: linear-gradient(to top, #00626c 5%, rgba(0, 98, 108, 0.78) 55%, rgba(0, 98, 108, 0.35)); }
-.event-hero-arch { position: absolute; top: 1.25rem; bottom: -1px; inset-inline-end: 3.5rem; width: 10.5rem; border: 2px solid rgba(255, 255, 255, 0.38); border-bottom: 0; border-radius: 5.25rem 5.25rem 0 0; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; }
-.event-hero-arch strong { font-size: 2.6rem; line-height: 1; }
-.event-hero-arch span { font-size: 0.9rem; opacity: 0.85; margin-top: 0.3rem; }
-.event-hero-copy { position: relative; z-index: 2; padding: 1.9rem 2rem; max-width: 34rem; }
+/* Next event banner: date arch sits beside the copy */
+.event-hero { display: flex; align-items: stretch; gap: clamp(0.75rem, 2vw, 1.75rem); overflow: hidden; border-radius: var(--radius-lg); background: #fff; color: var(--ink); border: 1px solid var(--line); margin-bottom: 1.5rem; padding-top: 1.15rem; padding-inline: clamp(1rem, 2.5vw, 2rem); box-shadow: 0 10px 28px rgba(0, 98, 108, 0.06); }
+.event-hero-arch { flex: 0 0 clamp(4.75rem, 18vw, 10.5rem); width: clamp(4.75rem, 18vw, 10.5rem); align-self: stretch; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; margin-bottom: -1px; border: 2px solid rgba(0, 98, 108, 0.28); border-bottom: 0; border-radius: 999px 999px 0 0; background: #f7fbfc; color: var(--vq-teal); }
+.event-hero-arch strong { font-size: clamp(1.55rem, 3vw, 2.6rem); line-height: 1; }
+.event-hero-arch span { font-size: clamp(0.7rem, 1.4vw, 0.9rem); color: var(--vq-ruby); margin-top: 0.3rem; }
+.event-hero-copy { flex: 1 1 auto; min-width: 0; padding: 0.45rem 0 1.4rem; }
 .event-hero-badge { display: inline-flex; align-items: center; gap: 0.35rem; background: var(--vq-amber); color: #fff; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.04em; padding: 0.22rem 0.8rem; border-radius: 999px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); }
-.event-hero-copy h2 { margin: 0.75rem 0 0.4rem; font-size: 1.6rem; line-height: 1.35; }
-.event-hero-copy p { color: #ccfbf1; font-size: 0.95rem; line-height: 1.7; }
-.event-hero-meta { display: flex; flex-wrap: wrap; gap: 0.35rem 1.1rem; margin-top: 0.75rem; font-size: 0.85rem; }
-.event-hero-meta i { margin-inline-end: 0.35rem; opacity: 0.85; }
+.event-hero-copy h2 { margin: 0.75rem 0 0.4rem; font-size: 1.6rem; line-height: 1.35; color: var(--vq-teal-dark); }
+.event-hero-copy p { color: var(--text); font-size: 0.95rem; line-height: 1.7; }
+.event-hero-meta { display: flex; flex-wrap: wrap; gap: 0.35rem 1.1rem; margin-top: 0.75rem; font-size: 0.85rem; color: var(--ink-2); }
+.event-hero-meta i { margin-inline-end: 0.35rem; color: var(--vq-teal); opacity: 1; }
 .event-hero-cta { display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1rem; background: var(--vq-ruby); color: #fff; font-size: 0.875rem; font-weight: 500; padding: 0.55rem 1.4rem; border-radius: 999px; box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.18); }
 .event-hero:hover .event-hero-cta { background: #6f102c; }
 .calendar-nav { display: flex; align-items: center; gap: 0.35rem; }
 
 /* Calendar locations map — sits beside the month, pins follow the selected day */
-.calendar-map { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 1rem; overflow: hidden; background: #fff; min-height: 18rem; }
+.calendar-map { display: flex; flex-direction: column; height: 100%; border: 1px solid var(--line); border-radius: 1rem; overflow: hidden; background: #fff; min-height: 18rem; }
 .calendar-map-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.75rem 1rem; background: #f7fbfc; border-bottom: 1px solid var(--line-soft); }
 .calendar-map-head h4 { display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.95rem; color: var(--vq-teal); }
 .calendar-map-head h4 i { color: var(--vq-ruby); }
@@ -1864,7 +1884,7 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
 
 /* Current month (name from today's date) under the Theme of the Month ticker */
 .util-stack { display: flex; flex-direction: column; gap: 0.25rem; flex: 1 1 auto; min-width: 0; }
-.month-focus { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+.month-focus { display: flex; align-items: center; gap: 0.6rem; flex: 1 1 auto; min-width: 0; }
 .month-focus-label {
     display: inline-flex;
     align-items: center;
@@ -1919,7 +1939,30 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
     font-size: 0.7rem;
     flex-shrink: 0;
 }
+.util-widget[data-widget="theme"] .util-chip-icon { background: var(--vq-ruby); }
 .util-widget[data-widget="weather"] .util-chip-icon { background: var(--vq-amber); }
+.util-pop .theme-box { padding: 0.15rem 0.2rem 0.45rem; }
+.theme-list { margin: 0.15rem 0.35rem 0.2rem; display: flex; flex-direction: column; gap: 0.35rem; }
+.theme-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.45rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 0.55rem;
+    background: #f7fbfc;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+}
+.theme-list li::before {
+    content: "";
+    width: 0.4rem;
+    height: 0.4rem;
+    margin-top: 0.45rem;
+    border-radius: 50%;
+    background: var(--vq-ruby);
+    flex-shrink: 0;
+}
 .util-chip-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; text-align: start; }
 .util-chip-text small { font-size: 0.6rem; color: var(--muted); }
 .util-chip-text strong { font-size: 0.82rem; font-weight: 500; }
@@ -1948,10 +1991,11 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
 /* ==========================================================================
    Homepage circulars — Internal Comms (left) and Employee Relations (right)
    ========================================================================== */
-.circulars-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; align-items: start; }
+.circulars-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; align-items: stretch; }
 .circular-box {
     display: flex;
     flex-direction: column;
+    height: 100%;
     border: 1px solid var(--line);
     border-radius: 0.9rem;
     background: #fff;
@@ -1985,11 +2029,16 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
 .circular-box-head .show-more { flex-shrink: 0; }
 /* One featured circular (the shared .listing-card used by the Announcements page) with the
    other recent circulars listed beside it as plain links. */
-.circular-body { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 0.85rem; padding: 0.75rem; align-items: start; }
+.circular-body { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 0.85rem; padding: 0.75rem; align-items: stretch; flex: 1; }
 .circular-body.is-single { grid-template-columns: minmax(0, 1fr); }
-.circular-feature .listing-card { flex-direction: column; min-height: 0; border-radius: 0.85rem; }
+.circular-feature, .circular-links { height: 100%; min-height: 0; }
+.circular-feature .listing-card { flex-direction: column; height: 100%; min-height: 0; border-radius: 0.85rem; }
 .circular-feature .card-header { width: 100%; min-width: 0; height: auto; aspect-ratio: 16 / 9; max-height: 11rem; }
-.circular-feature .card-details { padding: 0.7rem 0.75rem 0.8rem; gap: 0.45rem; }
+.circular-feature .card-details { flex: 1; justify-content: flex-start; align-items: flex-start; padding: 0.7rem 0.75rem 0.8rem; gap: 0.45rem; }
+.circular-feature .card-info,
+.circular-feature .card-foot,
+.circular-feature .card-meta { width: 100%; }
+.circular-feature .card-foot { justify-content: flex-start; margin-top: 0.15rem; }
 .circular-feature .card-chips { gap: 0.25rem; margin-bottom: 0.35rem; }
 .circular-feature .card-chips .tag { font-size: 0.62rem; padding: 0.05rem 0.45rem; }
 .circular-feature .card-title {
@@ -2003,8 +2052,8 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
 }
 .circular-feature .card-description { font-size: 0.78rem; line-height: 1.6; -webkit-line-clamp: 2; }
 .circular-feature .listing-card:hover .card-title { color: var(--box-accent); }
-.circular-feature .card-meta { font-size: 0.72rem; gap: 0.2rem 0.6rem; }
-.circular-feature .card-meta .mask-icon { width: 0.85rem; height: 0.85rem; color: var(--vq-ruby); margin-inline-end: 0.3rem; vertical-align: -2px; }
+.circular-feature .card-meta { font-size: 0.72rem; gap: 0.2rem 0.6rem; align-items: center; }
+.circular-feature .card-meta i { color: var(--vq-ruby); font-size: 0.85rem; margin-inline-end: 0.35rem; }
 .circular-links { min-width: 0; }
 .circular-links-title { font-size: 0.72rem; font-weight: 500; color: var(--muted); padding-bottom: 0.35rem; border-bottom: 1px solid var(--line-soft); }
 .circular-links ul { display: flex; flex-direction: column; }
@@ -2159,7 +2208,6 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
     .offers-grid { grid-template-columns: 1fr; }
     .calendar-layout { grid-template-columns: 1fr; }
     .now-playing { grid-template-columns: 1fr; }
-    .event-hero-arch { display: none; }
 }
 
 @media (max-width: 1024px) {
@@ -2178,10 +2226,23 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
     }
     .navbar-right { display: contents; margin: 0; }
     .header-start { display: flex; grid-column: 1; gap: 0.4rem; }
-    .search-box { grid-column: 2; width: 100%; max-width: 34rem; justify-self: center; }
+    .header-mid {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        grid-column: 2;
+        width: 100%;
+        max-width: 42rem;
+        min-width: 0;
+        justify-self: center;
+    }
+    .header-mid .search-box { grid-column: auto; width: auto; max-width: none; flex: 1 1 auto; min-width: 0; justify-self: auto; }
+    .header-mid .search-field { width: 100%; }
+    .header-widget-slot { display: flex; align-items: center; gap: 0.3rem; flex: 0 0 auto; }
+    .header-mid .util-widget { position: relative; }
     .header-tools { grid-column: 3; justify-self: end; gap: 0.35rem; }
     .header-logo { display: inline-flex; }
-    .header-logo img { height: 2.35rem; max-width: 7rem; }
+    .header-logo img { height: 1.85rem; max-width: 5.5rem; }
     .menu-toggle { display: inline-flex; width: 2.05rem; height: 2.05rem; border-radius: 0.55rem; font-size: 0.95rem; }
     .search-field { width: 100%; padding: 0.02rem 0.7rem; }
     .search-field input { padding: 0.28rem 0.1rem; font-size: 0.875rem; }
@@ -2202,6 +2263,16 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
     [dir="rtl"] .navbar-right { display: contents; }
     [dir="rtl"] .header-logo { order: 1; flex-shrink: 0; }
     [dir="rtl"] .menu-toggle { order: 2; flex-shrink: 0; }
+    [dir="rtl"] .header-mid {
+        order: 3;
+        flex: 1 1 auto;
+        display: flex;
+        align-items: center;
+        width: auto;
+        max-width: none;
+        min-width: 0;
+    }
+    [dir="rtl"] .header-widget-slot { order: -1; }
     [dir="rtl"] .search-box {
         order: 3;
         flex: 1 1 auto;
@@ -2213,7 +2284,8 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
         min-width: 0;
     }
     [dir="rtl"] .header-tools { order: 4; flex-shrink: 0; justify-self: auto; }
-    [dir="rtl"] .search-field { width: min(100%, 34rem); }
+    [dir="rtl"] .header-mid .search-field { width: 100%; }
+    [dir="rtl"] .header-mid .util-pop { inset-inline-end: auto; inset-inline-start: 0; }
     html.menu-open,
     html.menu-open body { overflow: hidden; }
     .menu-open .header { z-index: 130; }
@@ -2306,7 +2378,7 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
     .month-focus-items li { width: 100%; }
     .month-focus-items li + li::before { content: none; }
     .sidebar-right { border-inline-start: 0; border-top: 1px solid #d9e6e8; }
-    .prayer-times-section { position: static; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; padding: 1.25rem; }
+    .prayer-times-section { position: static; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; padding: 1.25rem; }
     .prayer-times-section .links-section { grid-column: 1 / -1; }
     .content { padding: 1.1rem 1.1rem 2rem; }
 }
@@ -2395,9 +2467,13 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
     .util-wrap { --util-h: auto; }
     .util-bar { flex-wrap: wrap; gap: 0.35rem; padding: 0.3rem 0.65rem; }
     .util-widgets { order: 1; position: relative; width: 100%; margin-inline-start: 0; justify-content: flex-end; }
-    .ticker { order: 2; flex: 1 1 100%; min-width: 0; }
-    .util-stack { order: 2; flex: 1 1 100%; gap: 0.35rem; }
-    .util-stack .ticker { order: 0; }
+    .month-focus,
+    .ticker,
+    .util-stack { order: 2; flex: 1 1 100%; }
+    .header-mid .util-chip-text small,
+    .header-mid .util-chip-caret { display: none; }
+    .header-mid .util-chip { gap: 0.28rem; padding-inline: 0.22rem 0.45rem; }
+    .header-mid .util-widget { position: relative; }
     .month-focus-items { font-size: 0.76rem; }
     /* Anchor both panels to the widget row, not to the single chip, so the first chip's
        panel cannot run past the edge of a narrow screen. */
@@ -2450,11 +2526,19 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
         --compact-search-gap: 0.4rem;
         --compact-search-h: 2.55rem;
     }
-    .header-logo img { height: 2.05rem; max-width: 6.2rem; }
+    .header-logo img { height: 1.6rem; max-width: 4.8rem; }
+    .header-mid { width: auto; max-width: none; justify-self: end; flex: 0 0 auto; gap: 0.25rem; }
+    .header-mid .search-box { flex: 0 0 auto; }
+    .header-widget-slot { gap: 0.2rem; }
+    .header-mid .util-chip { gap: 0.15rem; padding-inline: 0.12rem 0.28rem; }
+    .header-mid .util-chip-icon { width: 1.15rem; height: 1.15rem; font-size: 0.55rem; }
+    .header-mid .util-chip-text strong { font-size: 0.68rem; }
     .search-box { position: static; display: flex; align-items: center; justify-content: center; }
     .search-toggle { display: inline-flex; }
     .search-field,
-    [dir="rtl"] .search-field {
+    .header-mid .search-field,
+    [dir="rtl"] .search-field,
+    [dir="rtl"] .header-mid .search-field {
         display: flex;
         position: absolute;
         z-index: 86;
@@ -2515,6 +2599,7 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
     }
     [dir="rtl"] .header-logo { margin-inline-end: auto; }
     [dir="rtl"] .menu-toggle { order: 2; }
+    [dir="rtl"] .header-mid { order: 3; flex: 0 0 auto; }
     [dir="rtl"] .search-box { order: 3; flex: 0 0 auto; width: auto; }
     [dir="rtl"] .header-tools { order: 4; }
 }
