@@ -146,7 +146,18 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
     grid-template-rows: auto auto 1fr auto;
     min-height: 100vh;
 }
+/* Extra row only while the dismissible month ticker is open. Closing it restores the grid above. */
+body.has-page-ticker .qt-page {
+    grid-template-areas:
+        "ticker ticker ticker"
+        "left header header"
+        "left utility utility"
+        "left content right"
+        "left footer footer";
+    grid-template-rows: auto auto auto 1fr auto;
+}
 
+.page-ticker { grid-area: ticker; }
 .header { grid-area: header; }
 .sidebar-left { grid-area: left; }
 .content { grid-area: content; min-width: 0; }
@@ -1852,7 +1863,35 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
 }
 .util-bar { display: flex; align-items: center; gap: 0.75rem; min-height: var(--util-h); padding: 0.3rem 1.15rem; }
 
-/* Ticker: one static prototype message, moving continuously from right to left */
+/* Dismissible ticker at the top of every page, above the header. */
+.page-ticker {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 2.55rem;
+    padding: 0.3rem 0.85rem;
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 1px 6px rgba(0, 98, 108, 0.06);
+}
+.page-ticker .ticker { flex: 1 1 auto; }
+.page-ticker-close {
+    width: 1.7rem;
+    height: 1.7rem;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.8rem;
+    line-height: 1;
+}
+.page-ticker-close:hover { color: var(--vq-ruby); border-color: rgba(138, 21, 56, 0.45); background: rgba(138, 21, 56, 0.06); }
+
+/* Scrolling strip: one message, repeated, moving continuously from right to left.
+   On every page this carries the current month's reminders. */
 .ticker { display: flex; align-items: center; gap: 0.6rem; flex: 1 1 auto; min-width: 0; }
 .ticker-label {
     display: inline-flex;
@@ -1880,7 +1919,8 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
 .ticker-item { padding-inline-end: 5rem; font-size: 0.82rem; font-weight: 500; color: var(--vq-teal-dark); white-space: nowrap; }
 .ticker:hover .ticker-track { animation-play-state: paused; }
 
-/* Current month (name from today's date) under the Theme of the Month ticker */
+/* Static strip: label plus a bullet list.
+   Every page: Theme of the Month, under the scrolling month ticker. */
 .util-stack { display: flex; flex-direction: column; gap: 0.25rem; flex: 1 1 auto; min-width: 0; }
 .month-focus { display: flex; align-items: center; gap: 0.6rem; flex: 1 1 auto; min-width: 0; }
 .month-focus-label {
@@ -2212,6 +2252,10 @@ textarea.form-control { resize: vertical; min-height: 5.5rem; line-height: 1.6; 
     .qt-page {
         grid-template-areas: "header" "utility" "content" "right" "footer";
         grid-template-columns: minmax(0, 1fr);
+    }
+    body.has-page-ticker .qt-page {
+        grid-template-areas: "ticker" "header" "utility" "content" "right" "footer";
+        grid-template-rows: auto auto auto 1fr auto;
     }
     :root { --header-h: 3.5rem; }
     .top-bar {

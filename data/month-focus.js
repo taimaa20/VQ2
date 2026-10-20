@@ -1,6 +1,6 @@
 /* Month-specific activities and reminders — DEMO CONTENT for the prototype.
    Shown on the homepage under Theme of the Month. The month name itself is never stored here:
-   it is taken from today's date (core.js monthFocusHTML), and the entry with the same index
+   it is taken from today's date (core.js monthFocusData), and the entry with the same index
    (0 = January … 11 = December) supplies that month's reminders. */
 window.VQData = window.VQData || {};
 

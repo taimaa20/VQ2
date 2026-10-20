@@ -517,55 +517,71 @@
 
     /* Current month fills the strip. The month name always comes from today's date
        (Arabic or English); the reminders are demo content kept per month in /data/month-focus.js. */
-    function monthFocusHTML() {
+    function monthFocusData() {
         const now = today();
         const name = new Intl.DateTimeFormat(isAr() ? 'ar-u-nu-latn' : 'en-US', { month: 'long' }).format(now);
         const items = ((D.monthFocus || [])[now.getMonth()] || []).map(tx);
-        return `<div class="month-focus" aria-label="${esc(t('hpMonthFocus') + ': ' + name)}">
-            <span class="month-focus-label"><i class="fa-regular fa-calendar" aria-hidden="true"></i>${esc(name)}</span>
+        return { name, items };
+    }
+
+    /* Static reminder list (ruby label + bullets). On both homepages this is Theme of the Month. */
+    function staticStripHTML(label, icon, items, ariaLabel) {
+        return `<div class="month-focus" aria-label="${esc(ariaLabel || label)}">
+            <span class="month-focus-label"><i class="${icon}" aria-hidden="true"></i>${esc(label)}</span>
             <ul class="month-focus-items">${items.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
         </div>`;
     }
 
-    function themeCardHTML() {
-        const items = t('hpThemes');
-        const list = Array.isArray(items) && items.length ? items : [t('hpThemeMessage')];
-        return `<section class="panel-box theme-box" aria-label="${t('hpTheme')}">
-            ${panelHead(t('hpTheme'), `<i class="fa-solid fa-bullseye"></i>`)}
-            <ul class="theme-list">${list.map(item => `<li>${esc(item)}</li>`).join('')}</ul>
-        </section>`;
-    }
-
-    function tickerHTML() {
-        const label = t('hpTheme');
-        const message = esc(t('hpThemeMessage'));
-        const copies = Array.from({ length: 8 }, (_, i) => `<span class="ticker-item"${i ? ' aria-hidden="true"' : ''}>${message}</span>`).join('');
-        return `<div class="ticker" aria-label="${esc(label)}">
-            <span class="ticker-label"><i class="fa-solid fa-bullseye" aria-hidden="true"></i>${esc(label)}</span>
+    /* Scrolling marquee (teal label). The message is repeated eight times and the
+       track slides by exactly one copy (12.5%), so the loop stays seamless. */
+    function scrollingStripHTML(label, icon, message, ariaLabel) {
+        const safe = esc(message);
+        const copies = Array.from({ length: 8 }, (_, i) => `<span class="ticker-item"${i ? ' aria-hidden="true"' : ''}>${safe}</span>`).join('');
+        return `<div class="ticker" aria-label="${esc(ariaLabel || label)}">
+            <span class="ticker-label"><i class="${icon}" aria-hidden="true"></i>${esc(label)}</span>
             <div class="ticker-viewport">
                 <div class="ticker-track">${copies}</div>
             </div>
         </div>`;
     }
 
+    /* Every page: month reminders scroll in a bar above the header.
+       Theme of the Month sits in the strip as a static list, same as the homepage. */
+    function pageTickerHTML() {
+        const { name, items } = monthFocusData();
+        const month = scrollingStripHTML(
+            name,
+            'fa-regular fa-calendar',
+            items.join(' • '),
+            t('hpMonthFocus') + ': ' + name
+        );
+        return `<div class="page-ticker" id="pageTicker">
+            ${month}
+            <button type="button" class="page-ticker-close" data-ticker-close aria-label="${esc(t('close'))}"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        </div>`;
+    }
+
+    function renderPageTicker() {
+        const existing = $('#pageTicker');
+        if (existing) existing.remove();
+        const html = pageTickerHTML();
+        document.body.classList.toggle('has-page-ticker', !!html);
+        if (html) $('#siteHeader').insertAdjacentHTML('beforebegin', html);
+    }
+
+    function homeTickerThemeHTML() {
+        const themes = t('hpThemes');
+        const themeItems = Array.isArray(themes) && themes.length ? themes : [t('hpThemeMessage')];
+        return staticStripHTML(t('hpTheme'), 'fa-solid fa-bullseye', themeItems);
+    }
+
     function utilBarHTML() {
         const next = nextPrayer();
         const w0 = WEATHER[0];
-        const strip = PAGE === 'home-ticker'
-            ? `<div class="util-stack">${monthFocusHTML()}${tickerHTML()}</div>`
-            : (PAGE === 'home' ? monthFocusHTML() : '');
+        const strip = homeTickerThemeHTML();
         return `<div class="util-bar">
             ${strip}
             <div class="util-widgets">
-                ${PAGE === 'home-ticker' ? '' : `<div class="util-widget" data-widget="theme">
-                    <button type="button" class="util-chip" data-widget-toggle aria-expanded="false" aria-controls="themePanel" title="${esc(t('wgThemeOpen'))}">
-                        <span class="util-chip-icon"><i class="fa-solid fa-bullseye" aria-hidden="true"></i></span>
-                        <span class="util-chip-text"><strong>${t('hpTheme')}</strong></span>
-                        <i class="fa-solid fa-chevron-down util-chip-caret" aria-hidden="true"></i>
-                        <span class="sr-only">${t('wgThemeOpen')}</span>
-                    </button>
-                    <div class="util-pop" id="themePanel" hidden>${themeCardHTML()}</div>
-                </div>`}
                 <div class="util-widget" data-widget="prayer">
                     <button type="button" class="util-chip" data-widget-toggle aria-expanded="false" aria-controls="prayerPanel" title="${esc(t('wgPrayerOpen'))}">
                         <span class="util-chip-icon"><i class="fa-solid fa-mosque" aria-hidden="true"></i></span>
@@ -1032,6 +1048,7 @@
         $('#siteMenu').innerHTML = menuHTML();
         bindHeader();
         $('#utilBar').innerHTML = utilBarHTML();
+        renderPageTicker();
         placeHeaderWidgets();
         $('#sidePanel').innerHTML = panelHTML();
         $('#siteFooter').innerHTML = footerHTML();
@@ -1239,6 +1256,12 @@
 
     function bindGlobal() {
         document.addEventListener('click', e => {
+            if (e.target.closest('[data-ticker-close]')) {
+                const bar = $('#pageTicker');
+                if (bar) bar.remove();
+                document.body.classList.remove('has-page-ticker');
+                return;
+            }
             if (e.target.closest('[data-modal-close]') || e.target.matches('[data-modal-overlay]')) {
                 closeModal();
                 return;
