@@ -6,7 +6,7 @@
      .header        TopBar       (logo · galleries · search · text size · language · user · sign-out)
      .sidebar-left  RightSidebar (teal menu with the white active tab)
      .content       page canvas  (one web part per page, rendered by assets/js/pages/*.js)
-     .sidebar-right RightPanel   (vision & mission · visitor statistics · team spotlight · links · hotlines)
+     .sidebar-right RightPanel   (vision & mission · links · visitor statistics · team spotlight · hotlines)
      .footer        FooterBar    (social links · copyright · certificate logos)
    No backend: everything reads from the /data files.
    ========================================================================== */
@@ -709,7 +709,7 @@
         });
     }
 
-    /* ---------- Side panel: vision & mission · visitor statistics · links · hotlines ---------- */
+    /* ---------- Side panel: vision & mission · links · visitor statistics · team spotlight · hotlines ---------- */
 
     /* Compact link tiles (small icon + short label): the Option 1 "Software & System Links"
        presentation the client preferred, rebuilt with Option 2's own tokens and classes.
@@ -760,16 +760,16 @@
                 </div>
             </section>
 
-            ${visitorStatsHTML()}
-
-            ${teamSpotlightHTML()}
-
             <section class="links-section" id="panelLinks" aria-label="${t('hpSystems')}">
                 ${panelHead(t('hpSystems'))}
                 <ul class="links-grid">
                     ${LINKS.map(linkTileHTML).join('')}
                 </ul>
             </section>
+
+            ${visitorStatsHTML()}
+
+            ${teamSpotlightHTML()}
 
             <section class="panel-box" aria-label="${t('navHotlines')}">
                 ${panelHead(t('navHotlines'))}

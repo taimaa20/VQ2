@@ -1,8 +1,8 @@
 /* Home — SPFx HomePage web part composition:
-   Internal Comms / Employee Relations circulars (one featured card + links each) → VQ Calendar → VQ & QT Events →
+   Internal Comms / Employee Relations circulars (one featured card + links each) → Calendar → Events →
    Tradeshows & Roadshows → Latest News → Discounts repository
    (The current-month strip and the theme, prayer, and weather chips sit in the shell strip
-   above; vision & mission, visitor statistics, links and hotlines live in the side panel) */
+   above; vision & mission, links, visitor statistics and hotlines live in the side panel) */
 (function () {
     const { t, tx, esc, ui, D } = VQ;
 
@@ -90,7 +90,7 @@
         'section-circulars'
     );
 
-    /* ---------- VQ Calendar, then QC Events (separate sections, no view switch) ---------- */
+    /* ---------- Calendar, then Events (separate sections, no view switch) ---------- */
 
     /* Same compact horizontal card as the discounts slider */
     function eventCard(e) {
