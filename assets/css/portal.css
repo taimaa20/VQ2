@@ -16,28 +16,39 @@
    section. Only repeated items (rows, tiles) carry a light border.
    ========================================================================== */
 
-/* ---------- Fonts (bundled in SPFx src/assets/fonts) ---------- */
+/* ---------- Fonts ----------
+   Both languages use the Visit Qatar cuts in assets/fonts/VISIT QATAR FONT
+   (Light 300, Regular 400, Medium 500, Bold 700). */
 @font-face {
     font-family: 'Visit Qatar';
-    src: url('../fonts/VisitQatar-Regular.woff2') format('woff2'),
-         url('../fonts/VisitQatar-Regular.woff') format('woff'),
-         url('../fonts/VisitQatar-Regular.ttf') format('truetype');
-    font-weight: 400 800;
+    src: url('../fonts/VISIT QATAR FONT/otf/VisitQatar-Light.otf') format('opentype'),
+         url('../fonts/VISIT QATAR FONT/ttf/VisitQatar-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
     font-display: swap;
 }
 @font-face {
-    font-family: '29LT Bukra';
-    src: url('../fonts/29LTBukra-Regular.woff2') format('woff2'),
-         url('../fonts/29LTBukra-Regular.woff') format('woff'),
-         url('../fonts/29LTBukra-Regular.ttf') format('truetype');
+    font-family: 'Visit Qatar';
+    src: url('../fonts/VISIT QATAR FONT/otf/VisitQatar-Regular.otf') format('opentype'),
+         url('../fonts/VISIT QATAR FONT/ttf/VisitQatar-Regular.ttf') format('truetype');
     font-weight: 400;
+    font-style: normal;
     font-display: swap;
 }
 @font-face {
-    font-family: '29LT Bukra';
-    src: url('../fonts/29LTBukra-Bold.woff2') format('woff2'),
-         url('../fonts/29LTBukra-Bold.ttf') format('truetype');
-    font-weight: 500 800;
+    font-family: 'Visit Qatar';
+    src: url('../fonts/VISIT QATAR FONT/otf/VisitQatar-Medium.otf') format('opentype'),
+         url('../fonts/VISIT QATAR FONT/ttf/VisitQatar-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Visit Qatar';
+    src: url('../fonts/VISIT QATAR FONT/otf/VisitQatar-Bold.otf') format('opentype'),
+         url('../fonts/VISIT QATAR FONT/ttf/VisitQatar-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
     font-display: swap;
 }
 
@@ -78,7 +89,7 @@
     --teal-tint: rgba(0, 98, 108, 0.08);
     --focus: 0 0 0 3px rgba(0, 98, 108, 0.14);
 
-    --font: "Visit Qatar", "زوروا قطر", "29LT Bukra", Tahoma, "Segoe UI", sans-serif;
+    --font: "Visit Qatar", Tahoma, "Segoe UI", sans-serif;
     --header-h: 4.5rem;
     --radius-lg: 1.25rem;
     --radius: 0.75rem;
@@ -614,7 +625,6 @@ body:not(.nav-collapsed) .sidebar-collapse-toggle .menu-icon-collapse { display:
 .nav-icon { width: 1.2rem; display: inline-flex; justify-content: center; font-size: 0.95rem; opacity: 0.95; flex-shrink: 0; }
 .nav-item.is-active { background: var(--page-bg); color: var(--vq-teal); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12); }
 .nav-item.is-active .nav-icon { color: var(--vq-teal); }
-.nav-label { white-space: nowrap; }
 button.nav-item { width: calc(100% - 0.4rem); text-align: start; }
 
 /* Departments → HR → Courses / VQ Structure */
