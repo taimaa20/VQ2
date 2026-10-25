@@ -67,7 +67,7 @@ window.VQ_I18N = {
         navHomeTicker: 'الصفحة الرئيسية — الشريط',
         navDepts: 'الإدارات',
         navAnnouncements: 'الإعلانات',
-        navDiscounts: 'الخصومات',
+        navDiscounts: 'برنامج امتيازات Visit Qatar',
         navCerts: 'شهادات قطر للسياحة',
         navAwards: 'الجوائز المستلمة',
         navEvents: 'الفعاليات',
@@ -161,7 +161,7 @@ window.VQ_I18N = {
         nextMonth: 'الشهر التالي',
 
         /* Discounts */
-        dsTitle: 'خصومات الموظفين',
+        dsTitle: 'برنامج امتيازات Visit Qatar',
         dsDesc: 'عروض وخصومات حصرية لموظفي قطر للسياحة لدى الفنادق والمطاعم والشركاء، مع نسبة الخصم وتاريخ الانتهاء.',
         dsSearch: 'ابحث عن عرض أو شريك...',
         dsUpTo: 'حتى',
@@ -345,8 +345,8 @@ window.VQ_I18N = {
         hpCalendarSync: 'مزامنة SeaTable حسب صلاحيات الإدارة',
         hpViewList: 'قائمة',
         hpViewCalendar: 'تقويم',
-        hpDiscounts: 'الخصومات',
-        hpDiscountsDesc: 'مستودع الخصومات وعروض الشركاء المتاحة للموظفين.',
+        hpDiscounts: 'برنامج امتيازات Visit Qatar',
+        hpDiscountsDesc: 'عروض الشركاء المتاحة للموظفين من خلال برنامج امتيازات Visit Qatar.',
         hpNews: 'آخر الأخبار',
         hpHotlines: 'الخطوط الساخنة',
 
@@ -504,7 +504,7 @@ window.VQ_I18N = {
         navHomeTicker: 'Homepage — ticker',
         navDepts: 'Departments',
         navAnnouncements: 'Announcements',
-        navDiscounts: 'Discounts',
+        navDiscounts: 'VQ Privilege Program',
         navCerts: 'Visit Qatar Certificates',
         navAwards: 'Received Awards',
         navEvents: 'Events',
@@ -598,7 +598,7 @@ window.VQ_I18N = {
         nextMonth: 'Next month',
 
         /* Discounts */
-        dsTitle: 'Employee Discounts',
+        dsTitle: 'VQ Privilege Program',
         dsDesc: 'Exclusive offers for Visit Qatar employees at hotels, restaurants and partners — with discount rate and expiry date.',
         dsSearch: 'Search offers or partners...',
         dsUpTo: 'Up to',
@@ -782,8 +782,8 @@ window.VQ_I18N = {
         hpCalendarSync: 'SeaTable sync by department access',
         hpViewList: 'List',
         hpViewCalendar: 'Calendar',
-        hpDiscounts: 'Discounts',
-        hpDiscountsDesc: 'A repository of employee discounts and partner offers.',
+        hpDiscounts: 'VQ Privilege Program',
+        hpDiscountsDesc: 'Partner offers available to employees through the VQ Privilege Program.',
         hpNews: 'Latest News',
         hpHotlines: 'Hotlines',
 

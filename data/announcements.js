@@ -149,9 +149,9 @@ VQData.announcements = [
         summary: { ar: 'أسعار خاصة وعروض حصرية عن طريق عدد كبير من الشركاء.', en: 'Special prices and exclusive offers through a wide network of partners.' },
         body: [
             { ar: 'يسرّنا أن نعلن أن جميع الموظفين يمكنهم الآن الحصول على أسعار خاصة وعروض حصرية عن طريق عدد كبير من الشركاء.', en: 'We are pleased to announce that all employees can now enjoy special prices and exclusive offers through a wide network of partners.' },
-            { ar: 'تفاصيل كل عرض وشروطه متاحة في صفحة الخصومات.', en: 'Details and terms for each offer are available on the Discounts page.' }
+            { ar: 'تفاصيل كل عرض وشروطه متاحة في صفحة برنامج امتيازات Visit Qatar.', en: 'Details and terms for each offer are available on the VQ Privilege Program page.' }
         ],
-        link: { page: 'discounts', label: { ar: 'عرض الخصومات', en: 'View discounts' } }
+        link: { page: 'discounts', label: { ar: 'عرض برنامج امتيازات Visit Qatar', en: 'View VQ Privilege Program' } }
     },
     {
         id: 'certificates-published',

@@ -1,6 +1,6 @@
 /* Home — SPFx HomePage web part composition:
    Internal Comms / Employee Relations circulars (one featured card + links each) → Calendar → Events →
-   Tradeshows & Roadshows → Latest News → Discounts repository
+   Tradeshows & Roadshows → Latest News → VQ Privilege Program
    (The current-month strip and the theme, prayer, and weather chips sit in the shell strip
    above; vision & mission, links, visitor statistics and hotlines live in the side panel) */
 (function () {
@@ -196,7 +196,7 @@
         );
     }
 
-    /* ---------- Discounts repository: listing cards in a slider (same pattern as Latest News) ---------- */
+    /* ---------- VQ Privilege Program: listing cards in a slider (same pattern as Latest News) ---------- */
 
     function discountsHTML() {
         return ui.section(

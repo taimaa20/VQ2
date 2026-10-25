@@ -64,7 +64,7 @@ VQData.discussions = [
     {
         id: 'topic-3', category: 'question', identity: 'alias', alias: 'Oryx', date: '2026-09-08', likes: 6,
         title: { ar: 'هل يمكن إضافة عروض جديدة للخصومات؟', en: 'Can new partner offers be suggested?' },
-        body: { ar: 'هل توجد آلية لاقتراح شركاء جدد لبرنامج خصومات الموظفين؟', en: 'Is there a way to suggest new partners for the employee discount programme?' },
+        body: { ar: 'هل توجد آلية لاقتراح شركاء جدد لبرنامج امتيازات Visit Qatar؟', en: 'Is there a way to suggest new partners for the VQ Privilege Program?' },
         replies: []
     }
 ];
@@ -74,6 +74,6 @@ VQData.boardPoll = {
     options: [
         { label: { ar: 'دليل رقمي للزوار', en: 'Digital visitor guide' }, votes: 21 },
         { label: { ar: 'تبسيط التسجيل في الدورات', en: 'Simpler course registration' }, votes: 14 },
-        { label: { ar: 'اقتراح شركاء جدد للخصومات', en: 'Suggest new discount partners' }, votes: 9 }
+        { label: { ar: 'اقتراح شركاء جدد لبرنامج امتيازات Visit Qatar', en: 'Suggest new VQ Privilege Program partners' }, votes: 9 }
     ]
 };
